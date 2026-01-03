@@ -20,7 +20,20 @@ class AuthService
 
     public function attemptLogin(string $username, string $password, string $ip): array
     {
-        $user = $this->userModel->where('username', $username)->first();
+        $client = service('curlrequest');
+
+        $response = $client->post(
+            'http://172.23.39.117/ComplaintSystem/public/api/getDataUserByName',
+            [
+                'http_errors' => false, // 🔥 PENTING
+                'form_params' => [
+                    'username' => $username,
+                ]
+            ]
+        );
+
+        $data = json_decode($response->getBody(), true);
+        $user = $data['data'];
 
         // ❌ user tidak ditemukan
         if (!$user) {
@@ -50,7 +63,7 @@ class AuthService
         }
 
         // ❌ password salah
-        if ($password != $user['password']) {
+        if (!password_verify($password, $user['password'])) {
 
             if ($attempt) {
                 $failed = $attempt['failed_attempt'] + 1;

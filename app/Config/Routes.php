@@ -1043,7 +1043,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
 
 // sudo
 
-$routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
+$routes->group('/sudo',['filter' => 'auth.token'], function ($routes) {
     $routes->get('', 'GodController::index');
     // booking
     $routes->get('databooking', 'BookingController::booking');

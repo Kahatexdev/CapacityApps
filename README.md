@@ -83,9 +83,9 @@ Konfigurasi minimal:
 app.baseURL = 'http://localhost:8080/'
 CI_ENVIRONMENT = development
 
-materialApiUrl = 'http://172.23.44.14/MaterialSystem/public/api'
-hrisApiUrl     = 'http://172.23.44.14/HumanResourceSystem/public/api'
-tlsApiUrl      = 'http://172.23.44.14/KHTEXT/public/api'
+materialApiUrl = 'http://172.23.39.117/MaterialSystem/public/api'
+hrisApiUrl     = 'http://172.23.39.117/HumanResourceSystem/public/api'
+tlsApiUrl      = 'http://172.23.39.117/KHTEXT/public/api'
 
 4. Database Migration & Seeder
 (rahasia WLE)

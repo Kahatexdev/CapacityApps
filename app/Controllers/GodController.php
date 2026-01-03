@@ -765,7 +765,37 @@ class GodController extends BaseController
 
     public function account()
     {
-        $userdata = $this->userModel->getData();
+        $client = service('curlrequest');
+
+        $response = $client->get(
+            'http://172.23.39.117/ComplaintSystem/public/api/CS/user',
+            [
+                'http_errors' => false, // 🔥 PENTING
+            ]
+        );
+
+        $userdata = json_decode($response->getBody(), true);
+        
+        $userAreas = $this->db->table('user_areas ua')
+            ->select('ua.user_id, a.name, a.id')
+            ->join('areas a', 'a.id = ua.area_id')
+            ->get()
+            ->getResultArray();
+
+        $areaMap = [];
+        $areaNameMap = [];
+
+        foreach ($userAreas as $ua) {
+            $areaMap[$ua['user_id']][]     = $ua['id'];
+            $areaNameMap[$ua['user_id']][] = $ua['name'];
+        }
+
+        foreach ($userdata['userData'] as &$user) {
+            $user['area_ids']   = implode(',', $areaMap[$user['id_user']] ?? []);
+            $user['area_names'] = implode(', ', $areaNameMap[$user['id_user']] ?? []);
+
+        }
+
         $areadata = $this->areaModel->findAll();
         $data = [
             'role' => session()->get('role'),
@@ -777,21 +807,37 @@ class GodController extends BaseController
             'active5' => '',
             'active6' => '',
             'active7' => '',
-            'userdata' => $userdata,
+            'userdata' => $userdata['userData'],
             'area' => $areadata
 
         ];
+        // dd($data);
         return view(session()->get('role') . '/Account/index', $data);
     }
     public function addaccount()
     {
-        $insert = [
-            'username' => $this->request->getPost("username"),
-            'password' => $this->request->getPost("password"),
-            'role' => $this->request->getPost("role"),
-        ];
-        $query = $this->userModel->insert($insert);
-        if ($query) {
+        $username = $this->request->getPost("username");
+        $password = $this->request->getPost("password");
+        $role     = $this->request->getPost("role");
+
+        $client = service('curlrequest');
+
+        $response = $client->post(
+            'http://172.23.39.117/ComplaintSystem/public/api/userAdd',
+            [
+                'http_errors' => false, // 🔥 PENTING
+                'form_params' => [
+                    'username' => $username,
+                    'password' => $password,
+                    'role' => $role,
+                    'ket' => 'CS',
+                ]
+            ]
+        );
+
+        $data = json_decode($response->getBody(), true);
+        // dd($data);
+        if ($data['success']) {
             return redirect()->to(base_url(session()->get('role') . '/account'))->with('success', 'User Berhasil di input');
         } else {
             return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'User Gagal di input');
@@ -799,34 +845,54 @@ class GodController extends BaseController
     }
     public function assignarea()
     {
-        $userId = $this->request->getPost("iduser");
-        $areaList = $this->request->getPost("areaList");
-        if (!empty($areaList)) {
-            $db = \Config\Database::connect();
-            foreach ($areaList as $areaId) {
-                $exists = $this->aksesModel->where(['user_id' => $userId, 'area_id' => $areaId])->first();
-                if (!$exists) {
-                    $data = [
-                        'role' => session()->get('role'),
-                        'user_id' => $userId,
-                        'area_id' => $areaId,
-                    ];
-                    $query = "INSERT INTO user_areas (user_id, area_id) VALUES (?, ?)";
-                    $db->query($query, [$userId, $areaId]);
-                    if (!$db) {
-                        return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'User Gagal di input');
-                    }
-                }
-            }
-            return redirect()->to(base_url(session()->get('role') . '/account'))->with('success', 'User Berhasil di input');
-        } else {
-            return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'Tidak ada data');
+        $userId   = $this->request->getPost('iduser');
+        $areaList = $this->request->getPost('areaList');
+
+        if (!$userId) {
+            return redirect()->back()->with('error', 'User tidak valid');
         }
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        // HAPUS SEMUA AREA USER SEBELUMNYA
+        $this->aksesModel->where('user_id', $userId)->delete();
+
+        // INSERT AREA BARU
+        if (!empty($areaList)) {
+            foreach ($areaList as $areaId) {
+                $db->query(
+                    "INSERT INTO user_areas (user_id, area_id) VALUES (?, ?)",
+                    [$userId, $areaId]
+                );
+            }
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return redirect()->back()->with('error', 'Assign Area Gagal');
+        }
+
+        return redirect()->back()->with('success', 'Assign Area Berhasil');
     }
     public function deleteaccount($id)
     {
-        $delete = $this->userModel->delete($id);
-        if ($delete) {
+        $client = service('curlrequest');
+
+        $response = $client->post(
+            'http://172.23.39.117/ComplaintSystem/public/api/userDelete',
+            [
+                'http_errors' => false, // 🔥 PENTING
+                'form_params' => [
+                    'id_user' => $id
+                ]
+            ]
+        );
+
+        $data = json_decode($response->getBody(), true);
+        // dd($data);
+        if ($data['success']) {
             return redirect()->to(base_url(session()->get('role') . '/account'))->with('success', 'User Berhasil di hapus');
         } else {
             return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'User Gagal di hapus');
@@ -835,51 +901,69 @@ class GodController extends BaseController
     public function updateaccount($id)
     {
         $db = \Config\Database::connect();
-        $db->transStart();
 
-        // Delete akses terkait user_id
-        $this->aksesModel->where('user_id', $id)->delete();
+        $username = $this->request->getPost('username');
+        $password = $this->request->getPost('password');
+        $role     = $this->request->getPost('role');
+        $areaList = $this->request->getPost('areaList');
 
-        // Data update user
-        $field = [
-            'username' => $this->request->getPost('username'),
-            'password' => $this->request->getPost('password'),
-            'role' => $this->request->getPost('role'),
+        // payload API
+        $payload = [
+            'id_user'       => $id,
+            'username' => $username,
+            'role'     => $role,
         ];
 
-        // Update data user
-        $update = $this->userModel->update($id, $field);
-        if ($update) {
-            $areaList = $this->request->getPost("areaList");
-
-            if (!empty($areaList)) {
-                foreach ($areaList as $areaId) {
-
-                    $data = [
-                        'role' => session()->get('role'),
-                        'user_id' => $id,
-                        'area_id' => $areaId,
-                    ];
-                    $query = "INSERT INTO user_areas (user_id, area_id) VALUES (?, ?)";
-                    $db->query($query, [$id, $areaId]);
-                    if (!$db) {
-                        return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'User Gagal di input');
-                    }
-                }
-            }
-
-            $db->transComplete();
-
-            if ($db->transStatus() === FALSE) {
-                return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'User Gagal di Update');
-            } else {
-                return redirect()->to(base_url(session()->get('role') . '/account'))->with('success', 'User Berhasil di Update');
-            }
-        } else {
-            $db->transRollback();
-            return redirect()->to(base_url(session()->get('role') . '/account'))->with('error', 'User Gagal di Update');
+        // dd($username,$password,$role,$areaList,$payload);
+        if (!empty($password)) {
+            $payload['password'] = password_hash($password, PASSWORD_DEFAULT);
         }
+
+        $client = service('curlrequest');
+
+        try {
+            $response = $client->post(
+                'http://172.23.39.117/ComplaintSystem/public/api/userUpdate',
+                [
+                    'http_errors' => false,
+                    'form_params' => $payload,
+                ]
+            );
+            // dd($payload);
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'Gagal koneksi ke API');
+        }
+
+        // 🔥 WAJIB cek status API
+        if ($response->getStatusCode() !== 200) {
+            return redirect()->back()->with('error', 'Update user gagal (API)');
+        }
+
+        // ==== BARU UPDATE AREA ====
+        $db->transStart();
+
+        // hapus area lama
+        $this->aksesModel->where('user_id', $id)->delete();
+
+        // insert area baru
+        if (!empty($areaList)) {
+            foreach ($areaList as $areaId) {
+                $db->query(
+                    "INSERT INTO user_areas (user_id, area_id) VALUES (?, ?)",
+                    [$id, $areaId]
+                );
+            }
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return redirect()->back()->with('error', 'Update area gagal');
+        }
+
+        return redirect()->back()->with('success', 'User berhasil di update');
     }
+
     public function updateSisa()
     {
         ini_set('memory_limit', '512M');

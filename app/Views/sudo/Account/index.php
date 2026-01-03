@@ -133,7 +133,13 @@
                                     <td class="text-xs"><?= $user['area_names'] ?></td>
                                     <td class="text-xs"> <?php if ($user['role'] == 'aps') : ?>
                                             <!-- If qty is null, set action to Import -->
-                                            <button class="btn bg-gradient-info btn-sm text-xxs assign-button" data-bs-toggle="modal" data-bs-target="#assignArea" data-id="<?= $user['id_user'] ?>">Assign</button>
+                                            <button
+                                                class="btn bg-gradient-info btn-sm text-xxs assign-button"
+                                                data-id="<?= $user['id_user'] ?>"
+                                                data-area="<?= esc($user['area_ids']) ?>">
+                                                Assign
+                                            </button>
+
 
                                         <?php else : ?>
                                             <!-- If qty is not null, set action to Details -->
@@ -143,7 +149,16 @@
 
                                     <td class=" text-xs">
 
-                                        <button class="btn bg-gradient-success btn-sm text-xxs edit-btn" data-bs-toggle="modal" data-bs-target="#edit-btn" data-id="<?= $user['id_user'] ?> " data-usn="<?= $user['username'] ?>" data-pass="<?= $user['password'] ?>" data-area="<?= $user['area_names'] ?>">Edit</button>
+                                        <button
+                                            class="btn bg-gradient-success btn-sm text-xxs edit-btn"
+                                            data-id="<?= $user['id_user'] ?>"
+                                            data-usn="<?= esc($user['username']) ?>"
+                                            data-role="<?= esc($user['role']) ?>"
+                                            data-area="<?= esc($user['area_ids']) ?>"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#ModalEdit">
+                                            Edit
+                                        </button>
                                         <button class=" btn bg-gradient-danger btn-sm text-xxs delete-btn" data-bs-toggle="modal" data-bs-target="#delete-btn" data-id="<?= $user['id_user'] ?> ">Delete</button>
 
                                     </td>
@@ -156,43 +171,48 @@
 
         </div>
     </div>
-    <div class=" modal fade bd-example-modal-lg" id="assignArea" tabindex="-1" role="dialog" aria-labelledby="assignArea" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered" role="document">
+    <div class="modal fade bd-example-modal-lg" id="assignArea" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Assign Area</h5>
-                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                    <h5 class="modal-title">Assign Area</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <form action="<?= base_url('sudo/assignarea') ?>" method="POST">
-                        <input type="text" name="iduser" id="iduser" hidden value="">
-                        <div class="row">
-                            <div class="col-lg-12 col-sm-12">
 
-                                <div class="form-group">
-                                    <label for="area"> Area</label>
-                                </div>
-                                <?php foreach ($area as $ar) : ?>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="<?= $ar['id'] ?>" id="fcustomCheck1" name="areaList[]">
-                                        <label class="custom-control-label" for="customCheck1"><?= $ar['name'] ?></label>
-                                    </div>
-                                <?php endforeach; ?>
+                <form action="<?= base_url('sudo/assignarea') ?>" method="POST">
+                    <div class="modal-body">
+
+                        <input type="hidden" name="iduser" id="assign_user_id">
+
+                        <label class="fw-bold mb-2">Area</label>
+
+                        <?php foreach ($area as $ar) : ?>
+                            <div class="form-check">
+                                <input
+                                    class="form-check-input assign-area-checkbox"
+                                    type="checkbox"
+                                    name="areaList[]"
+                                    value="<?= $ar['id'] ?>"
+                                    id="assign_area_<?= $ar['id'] ?>">
+                                <label class="form-check-label" for="assign_area_<?= $ar['id'] ?>">
+                                    <?= esc($ar['name']) ?>
+                                </label>
                             </div>
+                        <?php endforeach; ?>
 
+                    </div>
 
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn bg-gradient-info">Save</button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-gradient-info">Save</button>
+                    </div>
+                </form>
+
             </div>
         </div>
     </div>
+
     <div class="modal fade  bd-example-modal-lg" id="ModalDelete" tabindex="-1" role="dialog" aria-labelledby="modaldelete" aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -204,10 +224,6 @@
                 </div>
                 <div class="modal-body">
                     <form action="" method="post">
-                        <input type="hidden" class="form-control" name="no_model">
-                        <input type="hidden" class="form-control" name="delivery">
-                        <input type="hidden" class="form-control" name="jarum">
-                        <input type="text" name="idapsperstyle" id="" hidden value="">
                         Apakah anda yakin ingin menghapus Account?
                 </div>
                 <div class="modal-footer">
@@ -218,62 +234,70 @@
             </div>
         </div>
     </div>
-    <div class="modal fade  bd-example-modal-lg" id="ModalEdit" tabindex="-1" role="dialog" aria-ModalDelete="ModalEdit" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered" role="document">
+    <div class="modal fade bd-example-modal-lg" id="ModalEdit" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit Data User</h5>
-                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                    <h5 class="modal-title">Edit Data User</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal"></button>
                 </div>
+
                 <div class="modal-body">
-                    <form action="<?= base_url('sudo/addaccount') ?>" method="post">
-                        <div class="row">
-                            <div class="col-lg-12 col-sm-12">
+                    <form method="post" id="formEditUser">
+                        <!-- optional: kalau mau pakai hidden -->
+                        <input type="hidden" name="id_user" id="edit_id_user">
 
-                                <div class="form-group">
-                                    <label for="buyer" class="col-form-label">Username:</label>
-                                    <input type="text" name="username" id="" class="form-control" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="no_order" class="col-form-label">Password:</label>
-                                    <input type="password" name="password" id="" class="form-control" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="productType" class="col-form-label">Role</label>
-                                    <select class="form-control" id="role" name="role">
-                                        <option>Choose</option>
-
-                                        <option> Capacity</option>
-                                        <option> Planning</option>
-                                        <option> Aps</option>
-                                        <option> User</option>
-                                        <option> Sudo</option>
-
-                                    </select>
-                                </div>
-                                <?php foreach ($area as $ar) : ?>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="<?= $ar['id'] ?>" id="fcustomCheck1" name="areaList[]">
-                                        <label class="custom-control-label" for="customCheck1"><?= $ar['name'] ?></label>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-
+                        <div class="form-group mb-2">
+                            <label>Username</label>
+                            <input type="text" name="username" class="form-control" required>
                         </div>
 
+                        <div class="form-group mb-2">
+                            <label>Password <small class="text-muted">(kosongkan jika tidak diubah)</small></label>
+                            <input type="password" name="password" class="form-control">
+                        </div>
 
+                        <div class="form-group mb-2">
+                            <label>Role</label>
+                            <select class="form-control" name="role" required>
+                                <option value="">Choose</option>
+                                <option value="capacity">Capacity</option>
+                                <option value="planning">Planning</option>
+                                <option value="aps">Aps</option>
+                                <option value="user">User</option>
+                                <option value="sudo">Sudo</option>
+                            </select>
+                        </div>
+
+                        <div class="mt-3">
+                            <label class="fw-bold">Area</label>
+                            <?php foreach ($area as $ar) : ?>
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        name="areaList[]"
+                                        value="<?= $ar['id'] ?>"
+                                        id="edit_area_<?= $ar['id'] ?>">
+                                    <label class="form-check-label" for="edit_area_<?= $ar['id'] ?>">
+                                        <?= esc($ar['name']) ?>
+                                    </label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <div class="modal-footer mt-3">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-info">Update</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn bg-gradient-info">Save</button>
-                </div>
-                </form>
+
             </div>
         </div>
     </div>
+
 </div>
 
 </div>
@@ -324,13 +348,29 @@
         });
     });
 
-    $('.assign-button').click(function() {
-        var id = $(this).data('id');
+    $('.assign-button').click(function () {
+        const userId = $(this).data('id');
+        const areas  = $(this).data('area'); // "1,2,3"
 
-        $('#assignArea').find('input[name="iduser"]').val(id);
+        const modal = $('#assignArea');
 
-        $('#assignArea').modal('show'); // Show the modal
+        modal.find('#assign_user_id').val(userId);
+
+        // reset semua checkbox
+        modal.find('.assign-area-checkbox').prop('checked', false);
+
+        // centang area existing
+        if (areas) {
+            areas.toString().split(',').forEach(idArea => {
+                modal.find(
+                    '.assign-area-checkbox[value="' + idArea.trim() + '"]'
+                ).prop('checked', true);
+            });
+        }
+
+        modal.modal('show');
     });
+
 
     $('.delete-btn').click(function() {
         var id = $(this).data('id');
@@ -338,16 +378,35 @@
 
         $('#ModalDelete').modal('show'); // Show the modal
     });
-    $('.edit-btn').click(function() {
-        var id = $(this).data('id');
-        var username = $(this).data('usn');
-        var pass = $(this).data('pass');
-        var area = $(this).data('area');
-        $('#ModalEdit').find('form').attr('action', '<?= base_url('sudo/updateaccount/') ?>' + id);
-        $('#ModalEdit').find('input[name="username"]').val(username);
-        $('#ModalEdit').find('input[name="password"]').val(pass);
-        $('#ModalEdit').modal('show'); // Show the modal
+    $('.edit-btn').click(function () {
+        const id       = $(this).data('id');
+        const username = $(this).data('usn');
+        const role     = $(this).data('role');
+        const areas    = $(this).data('area'); // "1,2,3"
+
+        const modal = $('#ModalEdit');
+
+        modal.find('#formEditUser')
+            .attr('action', '<?= base_url('sudo/updateaccount/') ?>' + id);
+
+        modal.find('input[name="id_user"]').val(id);
+        modal.find('input[name="username"]').val(username);
+        modal.find('input[name="password"]').val('');
+        modal.find('select[name="role"]').val(role.toLowerCase());
+
+        modal.find('input[name="areaList[]"]').prop('checked', false);
+
+        if (areas) {
+            areas.toString().split(',').forEach(idArea => {
+                modal.find(
+                    'input[name="areaList[]"][value="' + idArea.trim() + '"]'
+                ).prop('checked', true);
+            });
+        }
+
+        modal.modal('show');
     });
+
 </script>
 
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>

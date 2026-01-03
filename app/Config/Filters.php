@@ -36,6 +36,7 @@ class Filters extends BaseConfig
         'rosso' => \App\Filters\RossoFilter::class,
         'followup' => \App\Filters\FollowUp::class,
         'audit' => \App\Filters\AuditAutoFilter::class,
+        'auth.token' => \App\Filters\AuthTokenFilter::class,
 
     ];
 

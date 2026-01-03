@@ -745,8 +745,8 @@
 
             const form = event.target;
             const formData = new FormData(form);
-            const BASE_URL = "http://172.23.44.14/CapacityApps/public/";
-            // const BASE_URL = "http://172.23.44.14/CapacityApps/public/";
+            const BASE_URL = "http://172.23.39.117/CapacityApps/public/";
+            // const BASE_URL = "http://172.23.39.117/CapacityApps/public/";
 
             // Konversi FormData ke JSON tanpa "[]"
             const payload = {};
