@@ -23,7 +23,7 @@ class AuthService
         $client = service('curlrequest');
 
         $response = $client->post(
-            'http://172.23.39.117/ComplaintSystem/public/api/getDataUserByName',
+            'http://192.168.1.5/ComplaintSystem/public/api/getDataUserByName',
             [
                 'http_errors' => false, // 🔥 PENTING
                 'form_params' => [
