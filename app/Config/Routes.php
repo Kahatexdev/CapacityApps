@@ -629,6 +629,9 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('jatah_bahan_baku', 'MaterialController::jatahBahanBaku');
     $routes->get('export_excel_jatah_bb', 'ExcelController::exportExcelJatahNoModel');
 
+    // oe
+    $routes->get('oee', 'OEEController::index');
+
     // pengaduan
     $routes->get('pengaduan', 'PengaduanController::index');
     $routes->post('pengaduan/create', 'PengaduanController::create');
