@@ -879,6 +879,9 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('pengaduan', 'PengaduanController::index');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
+
+    // oee
+    $routes->get('oee', 'OEEController::index');
 });
 
 // user
@@ -1042,6 +1045,9 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('pengaduan', 'PengaduanController::index');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
+
+    // oee
+    $routes->get('oee', 'OEEController::index');
 });
 
 // sudo
@@ -1263,6 +1269,9 @@ $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
     $routes->get('pengaduan', 'PengaduanController::index');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
+
+    // oee
+    $routes->get('oee', 'OEEController::index');
 });
 
 // rosso
