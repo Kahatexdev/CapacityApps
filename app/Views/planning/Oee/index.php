@@ -100,12 +100,12 @@
                             <h5 class="fw-bold mb-0">Overall Equipment Effectiveness</h5>
                         </div>
 
-                        <div class="col-md-6 d-flex justify-content-md-end gap-2 mt-3 mt-md-0">
+                        <!-- <div class="col-md-6 d-flex justify-content-md-end gap-2 mt-3 mt-md-0">
                             <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modalImport"> <i class="fas fa-file-import me-1"></i> Import Downtime </button>
                             <a href="<?= base_url($role . '/oee/download-template') ?>" class="btn btn-success">
                                 <i class="fas fa-download me-1"></i> Download Template
                             </a>
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="row align-items-center border-top pt-3">
