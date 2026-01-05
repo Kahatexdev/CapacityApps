@@ -53,6 +53,10 @@ use App\Models\HistoryRevisiModel;
 use App\Models\PenggunaanJarum;
 use App\Models\DetailAreaMachineModel;
 use App\Models\DowntimeModel;
+use App\Models\DailyOeeModel;
+use App\Services\AuthService;
+use App\Models\LoginAttemptModel;
+use App\Models\AuditLogModel;
 
 /**
  * Class BaseController
@@ -66,6 +70,7 @@ use App\Models\DowntimeModel;
  */
 abstract class BaseController extends Controller
 {
+    protected $active;
     protected $filters;
     protected $productModel;
     protected $produksiModel;
@@ -119,6 +124,11 @@ abstract class BaseController extends Controller
     protected $urlMaterial;
     protected $urlHris;
     protected $urlTls;
+    protected $db;
+    protected $dailyOee;
+    protected $authService;
+    protected $LoginAttemptModel;
+    protected $auditLogModel;
 
     public function __construct() {}
     /**
@@ -155,7 +165,7 @@ abstract class BaseController extends Controller
         service('renderer')->setVar('materialApiUrl', api_url('material'));
         service('renderer')->setVar('hrisApiUrl', api_url('hris'));
         service('renderer')->setVar('tlsApiUrl', api_url('tls'));
-
+        $this->db = \Config\Database::connect();
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();
         $this->productModel = new ProductTypeModel();
@@ -202,6 +212,14 @@ abstract class BaseController extends Controller
         $this->replyModel = new PengaduanReply();
         $this->detailAreaMc = new DetailAreaMachineModel();
         $this->downtimeModel = new DowntimeModel();
+        $this->dailyOee = new DailyOeeModel();
+        $this->authService = new AuthService();
+        $this->LoginAttemptModel = new LoginAttemptModel();
+        $this->auditLogModel = new AuditLogModel();
+        $this->request = \Config\Services::request();
+
+        $this->role = session()->get('role');
+
         if ($this->filters   = ['role' => [session()->get('role') . '']] != session()->get('role')) {
             return redirect()->to(base_url('/login'));
         }

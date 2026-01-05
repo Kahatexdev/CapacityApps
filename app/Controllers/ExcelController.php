@@ -4179,35 +4179,57 @@ class ExcelController extends BaseController
         $qtyOrderList = [];
 
         foreach ($dataPoTambahan as $item) {
-            $style = $item['style_size'];
-            $noModel = $item['no_model'];  // ambil langsung dari API
-            $area = $item['admin'];        // atau sesuai kolom factory di DB
+            $style   = $item['style_size'];
+            $noModel = $item['no_model'];
+            $area    = $item['admin'];
 
-            // Ambil qty dari DB lokal
-            $qty = $this->ApsPerstyleModel->getSisaPerSize($area, $noModel, [$style]);
-            $qtyOrderList[$style] = is_array($qty) ? ($qty['qty'] ?? 0) : ($qty->qty ?? 0);
+            $result = $this->ApsPerstyleModel->getPerSize(
+                $area,
+                $noModel,
+                [$style]
+            );
+
+            // Ambil qty dengan aman
+            $qty = (!empty($result) && isset($result[0]['qty']))
+                ? (float)$result[0]['qty']
+                : 0;
+
+            // Simpan per model + size
+            $qtyOrderList[$noModel][$style] = $qty;
+
+            // Optional: log per baris
+            // log_message(
+            //     'debug',
+            //     "QtyOrder | Area={$area} | Model={$noModel} | Size={$style} | Qty={$qty}"
+            // );
         }
 
         // Gabungkan ke response
         foreach ($dataPoTambahan as $i => $row) {
-            $style = $row['style_size'];
-            $qty_order = isset($qtyOrderList[$style]) ? (float)$qtyOrderList[$style] : 0;
-            $composition = (float)$row['composition'] ?? 0;
-            $gw = (float)$row['gw'] ?? 0;
-            $loss = (float)$row['loss'] ?? 0;
+            $noModel = $row['no_model'];
+            $style   = $row['style_size'];
+
+            // 🔑 ambil qty berdasarkan model + size
+            $qty_order = $qtyOrderList[$noModel][$style] ?? 0;
+
+            $composition = (float) ($row['composition'] ?? 0);
+            $gw          = (float) ($row['gw'] ?? 0);
+            $loss        = (float) ($row['loss'] ?? 0);
 
             $dataPoTambahan[$i]['qty_order'] = $qty_order;
-            $dataPoTambahan[$i]['kg_po'] = ($qty_order * $composition * $gw / 100 / 1000) * (1 + ($loss / 100));
+            $dataPoTambahan[$i]['kg_po'] =
+                ($qty_order * $composition * $gw / 100 / 1000)
+                * (1 + ($loss / 100));
 
-            // --- Cari dan masukkan data retur berdasarkan 4 key ---
+            // ====== RETUR (tetap seperti punyamu, SUDAH BENAR) ======
             $key = $row['no_model'] . '|' . $row['item_type'] . '|' . $row['kode_warna'] . '|' . $row['color'];
+
             if (isset($returIndex[$key])) {
                 $dataPoTambahan[$i]['kgs_retur'] = $returIndex[$key]['kgs_retur'];
                 $dataPoTambahan[$i]['cns_retur'] = $returIndex[$key]['cns_retur'];
                 $dataPoTambahan[$i]['krg_retur'] = $returIndex[$key]['krg_retur'];
                 $dataPoTambahan[$i]['lot_retur'] = $returIndex[$key]['lot_retur'];
             } else {
-                // Default 0 / kosong kalau tidak ada retur
                 $dataPoTambahan[$i]['kgs_retur'] = 0;
                 $dataPoTambahan[$i]['cns_retur'] = 0;
                 $dataPoTambahan[$i]['krg_retur'] = 0;
@@ -8012,11 +8034,15 @@ class ExcelController extends BaseController
                     $fmt($sisa_order_pcs, 0), // P
                     $fmt($poplus_mc_kg, 2), // Q
                     '', // R
-                    $fmt($poplus_mc_kg / $kg_po * 100, 2) . '%', // S
+                    ($kg_po > 0 && $poplus_mc_kg > 0)
+                        ? number_format(($poplus_mc_kg / $kg_po) * 100, 2) . '%'
+                        : '', // S
                     $fmt($plus_pck_pcs, 0), // T
                     $fmt($plus_pck_kg, 2), // U
                     '', // V
-                    $fmt($plus_pck_kg / $kg_po * 100, 2) . '%', // W
+                    ($kg_po > 0 && $plus_pck_kg > 0)
+                        ? number_format(($plus_pck_kg / $kg_po) * 100, 2) . '%'
+                        : '', // W
                     '', // X
                     '', // Y
                     '', // Z
@@ -15728,7 +15754,7 @@ class ExcelController extends BaseController
                 $prodMap = $bsMcMap = $pbMap = $bsStocklotMap = [];
 
                 $allProd = $this->produksiModel
-                    ->select('SUM(produksi.qty_produksi) AS qtyProd, produksi.area, apsperstyle.size, MAX(tgl_produksi) AS tglProd')
+                    ->select('SUM(produksi.qty_produksi) AS qtyProd, UPPER(produksi.area) AS area, apsperstyle.size, MAX(tgl_produksi) AS tglProd')
                     ->join('apsperstyle', 'apsperstyle.idapsperstyle=produksi.idapsperstyle')
                     ->where('apsperstyle.mastermodel', $no_model)
                     ->groupBy('produksi.area, apsperstyle.size')
@@ -15745,7 +15771,7 @@ class ExcelController extends BaseController
                 // 3. BS MESIN (1 QUERY)
                 // ===========================
                 $allBsMc = $this->bsMesinModel
-                    ->select('area, size, SUM(qty_gram) AS bs_gram, SUM(qty_pcs) AS qty_pcs, MAX(tanggal_produksi) AS tglBsMc')
+                    ->select('UPPER(area) AS area, size, SUM(qty_gram) AS bs_gram, SUM(qty_pcs) AS qty_pcs, MAX(tanggal_produksi) AS tglBsMc')
                     ->where('no_model', $no_model)
                     ->groupBy('area, size')
                     ->findAll();
@@ -15762,7 +15788,7 @@ class ExcelController extends BaseController
                 // 4. PERBAIKAN AREA (1 QUERY)
                 // ===========================
                 $allPb = $this->perbaikanAreaModel
-                    ->select('perbaikan_area.area, apsperstyle.size, SUM(perbaikan_area.qty) AS qtyPb, MAX(tgl_perbaikan) AS tglPbArea')
+                    ->select('UPPER(perbaikan_area.area) AS area, apsperstyle.size, SUM(perbaikan_area.qty) AS qtyPb, MAX(tgl_perbaikan) AS tglPbArea')
                     ->join('apsperstyle', 'apsperstyle.idapsperstyle = perbaikan_area.idapsperstyle')
                     ->where('apsperstyle.mastermodel', $no_model)
                     ->where('apsperstyle.qty > 0')
@@ -15780,7 +15806,7 @@ class ExcelController extends BaseController
                 // 5. BS STOCKLOT (1 QUERY)
                 // ===========================
                 $allBsStocklot = $this->bsModel
-                    ->select('data_bs.area, apsperstyle.size, SUM(data_bs.qty) AS qtyBs, MAX(data_bs.tgl_instocklot) AS tglBs')
+                    ->select('UPPER(data_bs.area) AS area, apsperstyle.size, SUM(data_bs.qty) AS qtyBs, MAX(data_bs.tgl_instocklot) AS tglBs')
                     ->join('apsperstyle', 'apsperstyle.idapsperstyle = data_bs.idapsperstyle')
                     ->where('apsperstyle.mastermodel', $no_model)
                     ->groupBy('data_bs.area, apsperstyle.size')
@@ -15801,28 +15827,34 @@ class ExcelController extends BaseController
                     $size = $id['size'];
 
                     // PRODUKSI
-                    $allData[$key]['prodPcs'] = $prodMap[$area][$size]['prod'] ?? 0;
-                    $allData[$key]['prodDz'] = round($prodMap[$area][$size]['prod'] / 24) ?? 0;
+                    $allData[$key]['prodPcs'] = $prodQty = $prodMap[$area][$size]['prod'] ?? 0;
+                    $allData[$key]['prodDz'] = round($prodQty / 24) ?? 0;
                     $allData[$key]['tglProd'] = $prodMap[$area][$size]['tglProd'] ?? '';
 
                     // BS MESIN
-                    $allData[$key]['bsMcPcs']  = $bsMcMap[$area][$size]['qty_pcs'] ?? 0;
-                    $allData[$key]['bsMcGram'] = $bsMcMap[$area][$size]['bs_gram'] ?? 0;
-                    $bsMcPercen = $bsMcMap[$area][$size]['qty_pcs'] / ($prodMap[$area][$size]['prod'] + $bsMcMap[$area][$size]['qty_pcs']) * 100;
+                    $allData[$key]['bsMcPcs']  = $bsMcQty = $bsMcMap[$area][$size]['qty_pcs'] ?? 0;
+                    $allData[$key]['bsMcGram'] = $bsMcGram = $bsMcMap[$area][$size]['bs_gram'] ?? 0;
+                    $bsMcPercen = $bsMcQty > 0
+                        ? $bsMcQty / ($prodQty + $bsMcQty) * 100
+                        : 0;
                     $allData[$key]['bsMcPercen'] = round($bsMcPercen) ?? 0;
                     $allData[$key]['tglBsMc']  = $bsMcMap[$area][$size]['tglBsMc'] ?? '';
 
                     // PERBAIKAN
-                    $allData[$key]['pbAreaPcs'] = $pbMap[$area][$size]['qtyPb'] ?? 0;
-                    $allData[$key]['pbAreaDz'] = round($pbMap[$area][$size]['qtyPb'] / 24) ?? 0;
-                    $pbAreaPercen = $pbMap[$area][$size]['qtyPb'] / $prodMap[$area][$size]['prod'] * 100;
+                    $allData[$key]['pbAreaPcs'] = $pbQty = $pbMap[$area][$size]['qtyPb'] ?? 0;
+                    $allData[$key]['pbAreaDz'] = round($pbQty / 24) ?? 0;
+                    $pbAreaPercen = $pbQty > 0
+                        ? ($pbQty / $prodQty) * 100
+                        : 0;
                     $allData[$key]['pbAreaPercen'] = round($pbAreaPercen) ?? 0;
                     $allData[$key]['tglPbArea'] = $pbMap[$area][$size]['tglPbArea'] ?? '';
 
                     // BS STOCKLOT
-                    $allData[$key]['bsStocklotPcs'] = $bsStocklotMap[$area][$size]['qtyBs'] ?? 0;
-                    $allData[$key]['bsStocklotDz'] = round($bsStocklotMap[$area][$size]['qtyBs'] / 24) ?? 0;
-                    $bsStocklotPercen = $bsStocklotMap[$area][$size]['qtyBs'] / $prodMap[$area][$size]['prod'] * 100;
+                    $allData[$key]['bsStocklotPcs'] = $bsStk = $bsStocklotMap[$area][$size]['qtyBs'] ?? 0;
+                    $allData[$key]['bsStocklotDz'] = round($bsStk / 24) ?? 0;
+                    $bsStocklotPercen = $bsStk > 0
+                        ? ($bsStk / $prodQty) * 100
+                        : 0;
                     $allData[$key]['bsStocklotPercen'] = round($bsStocklotPercen) ?? 0;
                     $allData[$key]['tglBs'] = $bsStocklotMap[$area][$size]['tglBs'] ?? '';
                 }

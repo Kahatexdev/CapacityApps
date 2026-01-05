@@ -3,21 +3,36 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Month;
 
 class DowntimeModel extends Model
 {
-    protected $table            = 'downtimes';
+    protected $table            = 'downtime';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = [
+        'area',
+        'tanggal',
+        'jarum',
+        'no_mc',
+        'total_time',
+        'loading_time',
+        'operating_time',
+        'performance',
+        'availability',
+        'quality',
+        'oee',
+        'breakdown',
+        'keterangan'
+    ];
 
     protected bool $allowEmptyInserts = false;
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -39,4 +54,48 @@ class DowntimeModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getOeeSummary($tanggal, $area)
+    {
+        return $this->select([
+            'AVG(oee) AS oee',
+            'AVG(quality) AS quality',
+            'AVG(performance) AS performance',
+            'AVG(availability) AS availability',
+        ])
+            ->where('tanggal', $tanggal)
+            ->where('area', $area)
+            ->where('OEE >', 0)
+            ->get()
+            ->getRowArray();
+    }
+
+    public function getOeeDetail($tanggal, $area)
+    {
+        return $this->where('tanggal', $tanggal)
+            ->where('area', $area)
+            ->where('OEE >', 0)
+            ->findAll();
+    }
+    public function getLatestData()
+    {
+        return $this->select('tanggal')
+            ->orderBy('tanggal', 'DESC')
+            ->first();
+    }
+    public function averageMonth(string $tanggal, string $area): array
+    {
+        return $this->select([
+            'AVG(oee) AS oee',
+            'AVG(quality) AS quality',
+            'AVG(performance) AS performance',
+            'AVG(availability) AS availability',
+        ])
+            ->where('MONTH(tanggal)', date('m', strtotime($tanggal)))
+            ->where('YEAR(tanggal)', date('Y', strtotime($tanggal)))
+            ->where('area', $area)
+            ->where('OEE >', 0)
+            ->get()
+            ->getRowArray();
+    }
 }

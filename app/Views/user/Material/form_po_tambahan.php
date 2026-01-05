@@ -83,7 +83,7 @@
                                     <select class="form-control select-no-model" name="no_model[0][no_model]" required>
                                         <option value="">Pilih No Model</option>
                                         <?php foreach ($noModel as $m) : ?>
-                                            <option value="<?= $m ?>" data-no-model="<?= $m ?>"><?= $m ?></option>
+                                            <option value="<?= $m['mastermodel'] ?>" data-no-model="<?= $m['mastermodel'] ?>"><?= $m['mastermodel'] ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
@@ -517,7 +517,9 @@
                 const poKgTanpaLoss = gw > 0 ?
                     qtyOrderVal * composition * gw / 100 / 1000 :
                     0;
-
+                console.log("QTY PO KG:", qtyPoKg);
+                console.log("QTY ORDER:", qtyOrderVal);
+                console.log("COMPOCITION:", composition);
                 $template.find('.po-kg-perstyle').val(qtyPoKg.toFixed(2));
                 $template.find('.po-kg-perstyle-tanpa-loss').val(poKgTanpaLoss.toFixed(2));
 

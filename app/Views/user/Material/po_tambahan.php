@@ -30,23 +30,23 @@
             <div class="card">
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between">
-                        <div class="col-7">
+                        <div class="col-5">
                             <p class="text-sm mb-0 text-capitalize font-weight-bold">Capacity System</p>
                             <h5 class="font-weight-bolder mb-0">
                                 List PO Tambahan <?= $area ?>
                             </h5>
                             <p style="color: red; font-size: 12px;">*Filter tgl po tambahan terlebih dahulu!</p>
                         </div>
-                        <div class="col-5 d-flex align-items-center text-end gap-2">
+                        <div class="col-7 d-flex align-items-center text-end gap-2">
                             <input type="hidden" class="form-control" id="area" value="<?= $area ?>">
                             <label for="no_model">No Model</label>
                             <input type="text" class="form-control" id="no_model" value="" placeholder="No Model">
                             <label for="tgl_po">Tgl Po Tambahan</label>
                             <input type="date" class="form-control" id="tgl_po" value="" required>
-                            <button id="searchFilter" class="btn btn-info ms-2"><i class="fas fa-search"></i> Filter</button>
-                            <button class="btn btn-info ms-2">
-                                <a href="<?= base_url($role . '/form-potambahan/' . $area) ?>" class="fa fa-list text-white" style="text-decoration: none;"> List</a>
-                            </button>
+                            <button id="searchFilter" class="btn btn-info ms-2"><i class="fas fa-filter"></i>Filter</button>
+                            <!-- <button class="btn btn-info ms-2"> -->
+                            <a href="<?= base_url($role . '/form-potambahan/' . $area) ?>" class="btn btn-info ms-2" style="text-decoration: none;"> <i class="fa fa-list text-white"></i> List</a>
+                            <!-- </button> -->
                         </div>
                     </div>
                 </div>

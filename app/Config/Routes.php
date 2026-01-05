@@ -18,6 +18,7 @@ $routes->get('chart/getPerbaikan', 'DeffectController::getPerbaikan');
 $routes->get('chart/getBsMesin', 'DeffectController::getBsMesin');
 $routes->get('chart/dashboardData', 'GodController::dashboardData');
 $routes->get('chart/getDailyProd', 'GodController::getDailyProd');
+$routes->get('oee/fetchData', 'OEEController::fetchData');
 $routes->get('exportProd', 'ExcelController::exportProd');
 
 
@@ -101,6 +102,7 @@ $routes->group(
         $routes->get('getDetailOrder', 'ApiController::getDetailOrder');
         $routes->get('getOrderStatus', 'ApiController::getOrderStatus');
         $routes->get('getDataOrderFetch', 'ApiController::getDataOrderFetch');
+        $routes->get('getWarnaSmv', 'ApiController::getWarnaSmv');
     }
 );
 
@@ -891,10 +893,10 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('dataprogress', 'ProduksiController::progressData');
     $routes->get('produksiareachart', 'ProduksiController::produksiAreaChart');
     $routes->get('dataproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
-    $routes->post('importproduksi', 'ProduksiController::importproduksinew');
-    $routes->post('resetproduksi', 'ProduksiController::resetproduksi');
-    $routes->post('resetproduksiarea', 'ProduksiController::resetproduksiarea');
-    $routes->post('editproduksi', 'ProduksiController::editproduksi');
+    $routes->post('importproduksi', 'ProduksiController::importproduksinew', ['filter' => 'audit']);
+    $routes->post('resetproduksi', 'ProduksiController::resetproduksi', ['filter' => 'audit']);
+    $routes->post('resetproduksiarea', 'ProduksiController::resetproduksiarea', ['filter' => 'audit']);
+    $routes->post('editproduksi', 'ProduksiController::editproduksi', ['filter' => 'audit']);
     $routes->get('updateproduksi', 'ProduksiController::updateproduksi');
     $routes->get('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
     $routes->post('detailproduksi/(:any)', 'ProduksiController::produksiPerArea/$1');
@@ -909,8 +911,8 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('inputinisial', 'UserController::inputinisial');
     $routes->get('statusorder/(:any)', 'OrderController::statusOrderArea/$1');
     $routes->get('estimasispk/(:any)', 'OrderController::estimasispk/$1');
-    $routes->post('mintaSpk2', 'OrderController::mintaSpk2');
-    $routes->post('spkmanual', 'OrderController::spkmanual');
+    $routes->post('mintaSpk2', 'OrderController::mintaSpk2', ['filter' => 'audit']);
+    $routes->post('spkmanual', 'OrderController::spkmanual', ['filter' => 'audit']);
     $routes->post('exportEstimasispk', 'ExcelController::exportEstimasispk');
     $routes->post('importinisial', 'UserController::importinisial');
     $routes->get('progressdetail/(:any)/(:any)', 'ApsController::progressdetail/$1/$2');
@@ -918,15 +920,15 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
 
 
     // $routes->post('importproduksi', 'ProduksiController::importproduksi');
-    $routes->post('importproduksi', 'ProduksiController::importproduksinew');
-    $routes->post('importbssetting', 'ProduksiController::importbssetting');
-    $routes->post('importbsmesin', 'ProduksiController::importbsmc');
+    $routes->post('importproduksi', 'ProduksiController::importproduksinew', ['filter' => 'audit']);
+    $routes->post('importbssetting', 'ProduksiController::importbssetting', ['filter' => 'audit']);
+    $routes->post('importbsmesin', 'ProduksiController::importbsmc', ['filter' => 'audit']);
     $routes->get('viewModelPlusPacking/(:any)', 'ProduksiController::viewModelPlusPacking/$1');
     $routes->get('pluspacking', 'ProduksiController::pluspacking');
     $routes->post('inputpo', 'ProduksiController::updatepo');
     $routes->post('get-area', 'ProduksiController::getArea');
     $routes->post('get-size', 'ProduksiController::getSize');
-    $routes->post('prosesInputProdManual', 'ProduksiController::inputProduksiManual');
+    $routes->post('prosesInputProdManual', 'ProduksiController::inputProduksiManual', ['filter' => 'audit']);
     $routes->get('generateDataProduksi', 'ExcelController::dataProduksi');
 
     //summary
@@ -938,21 +940,21 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->post('exportSummaryPerTgl', 'SummaryController::excelSummaryPerTgl');
 
     $routes->get('datadeffect', 'DeffectController::datadeffect');
-    $routes->post('inputKode', 'DeffectController::inputKode');
+    $routes->post('inputKode', 'DeffectController::inputKode', ['filter' => 'audit']);
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
 
     //timter produksi
-    $routes->post('timterProduksi', 'ProduksiController::timterProduksi');
+    $routes->post('timterProduksi', 'ProduksiController::timterProduksi', ['filter' => 'audit']);
     $routes->post('exportTimter', 'TimterController::excelTimter');
 
     // Jarum
     $routes->get('penggunaanJarum', 'UserController::penggunaanJarum');
-    $routes->post('savePenggunaanJarum', 'UserController::savePenggunaanJarum');
+    $routes->post('savePenggunaanJarum', 'UserController::savePenggunaanJarum', ['filter' => 'audit']);
     $routes->get('penggunaanPerbulan/(:any)/(:any)', 'UserController::penggunaanPerbulan/$1/$2');
     $routes->get('excelPenggunaanPerbulan/(:any)/(:any)', 'UserController::exportPenggunaanPerbulan/$1/$2');
 
     //summary bs mc
-    $routes->post('deleteBsMc', 'UserController::deleteBsMc');
+    $routes->post('deleteBsMc', 'UserController::deleteBsMc', ['filter' => 'audit']);
     $routes->post('exportSummaryBs', 'SummaryController::excelSummaryBs');
     $routes->get('exportBsMesinPerbulan/(:any)/(:any)', 'SummaryController::summaryBsMesinPerbulan/$1/$2');
 
@@ -1015,7 +1017,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('form-potambahan/(:any)', 'MaterialController::formPoTambahan/$1');
     $routes->get('getStyleSize/(:any)/(:any)', 'MaterialController::getStyleSize/$1/$2');
     $routes->get('poTambahanDetail/(:any)/(:any)', 'MaterialController::poTambahanDetail/$1/$2');
-    $routes->post('savePoTambahan/(:any)', 'MaterialController::savePoTambahan/$1');
+    $routes->post('savePoTambahan/(:any)', 'MaterialController::savePoTambahan/$1', ['filter' => 'audit']);
     $routes->get('filter_list_potambahan/(:any)', 'MaterialController::filterPoTambahan/$1');
     $routes->get('generate_po_tambahan', 'PdfController::generatePoTambahan');
     $routes->get('generate_excel_po_tambahan', 'ExcelController::generatePoTambahan');
@@ -1178,10 +1180,10 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     // deffect
     $routes->get('datadeffect', 'DeffectController::datadeffect');
     $routes->get('viewImportPerbaikan', 'UserController::perbaikanView');
-    $routes->post('inputKode', 'DeffectController::inputKode');
+    $routes->post('inputKode', 'DeffectController::inputKode', ['filter' => 'audit']);
     $routes->post('viewDataBs', 'DeffectController::viewDataBs');
-    $routes->post('resetbspdk', 'DeffectController::resetbs');
-    $routes->post('resetbsarea', 'DeffectController::resetbsarea');
+    $routes->post('resetbspdk', 'DeffectController::resetbs', ['filter' => 'audit']);
+    $routes->post('resetbsarea', 'DeffectController::resetbsarea', ['filter' => 'audit']);
     $routes->get('perbaikanArea', 'DeffectController::perbaikanArea');
     $routes->post('importperbaikanarea', 'ProduksiController::importPerbaikanArea');
     $routes->post('viewPerbaikan', 'DeffectController::viewPerbaikan');
@@ -1198,10 +1200,10 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
 
     // usermanageement
     $routes->get('account', 'GodController::account');
-    $routes->post('addaccount', 'GodController::addaccount');
-    $routes->post('assignarea', 'GodController::assignarea');
-    $routes->post('updateaccount/(:any)', 'GodController::updateaccount/$1');
-    $routes->post('deleteaccount/(:any)', 'GodController::deleteaccount/$1');
+    $routes->post('addaccount', 'GodController::addaccount', ['filter' => 'audit']);
+    $routes->post('assignarea', 'GodController::assignarea', ['filter' => 'audit']);
+    $routes->post('updateaccount/(:any)', 'GodController::updateaccount/$1', ['filter' => 'audit']);
+    $routes->post('deleteaccount/(:any)', 'GodController::deleteaccount/$1', ['filter' => 'audit']);
 
     // chat
     $routes->get('chat', 'ChatController::pesan');
@@ -1216,6 +1218,13 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
 
     // OEE
     $routes->get('oee', 'OEEController::index');
+    $routes->get('oee/download-template', 'OEEController::downloadTemplate');
+    $routes->post('oee/importdowntime', 'OEEController::import');
+
+    $routes->get('audit', 'AuditLogController::index');
+    $routes->get('audit/datatables', 'AuditLogController::datatables');
+    $routes->get('locked-users', 'AuthController::lockedUsers');
+    $routes->post('unlock-user/(:num)', 'AuthController::unlockUser/$1');
 });
 
 // ie

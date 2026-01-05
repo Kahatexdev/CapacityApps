@@ -1041,11 +1041,18 @@ class ApsPerstyleModel extends Model
             ->whereIn('idapsperstyle', (array) $idaps)
             ->findAll();
     }
-    public function getStyleSize($noModel)
+    public function getStyleSize($noModel, $area = NULL)
     {
-        return $this->select('size,inisial')
+        $builder = $this->select('size, inisial')
             ->where('mastermodel', $noModel)
-            ->where('qty > 0')
+            ->where('qty >', 0);
+
+        // tambahkan where area kalau ada
+        if (!empty($area)) {
+            $builder->where('factory', $area);
+        }
+
+        return $builder
             ->groupBy('size')
             ->orderBy('size', 'ASC')
             ->findAll();
@@ -1058,8 +1065,8 @@ class ApsPerstyleModel extends Model
             SELECT 
                 DATE_FORMAT(delivery, '%M') AS month_name, 
                 YEAR(delivery) AS year,
-                round(SUM(qty/24)) AS total_qty, 
-                round(SUM(sisa/24)) AS total_sisa
+                ROUND(SUM(qty/24)) AS total_qty, 
+                ROUND(SUM(sisa/24)) AS total_sisa
             FROM apsperstyle
             WHERE YEAR(delivery) = YEAR(CURDATE()) 
             AND production_unit !='MJ'
@@ -1212,6 +1219,19 @@ class ApsPerstyleModel extends Model
             ->whereIn('size', $size)
             ->where('qty >', 0)
             ->first(); // Ambil satu hasil
+    }
+
+    public function getPerSize($area, $nomodel, $size)
+    {
+        return $this->select('sum(qty) as qty, sum(sisa) as sisa, sum(po_plus) as po_plus')
+            ->where('factory', $area)
+            ->where('mastermodel', $nomodel)
+            ->whereIn('size', $size)
+            ->where('qty >', 0)
+            ->groupBy('mastermodel')
+            ->groupBy('size')
+            ->get()
+            ->getResultArray(); // Ambil satu hasil
     }
 
     public function getApsPerStyle($nomodel, $size, $area)
@@ -1486,8 +1506,8 @@ class ApsPerstyleModel extends Model
     public function getTotalOrderMonthByBuyer($month)
     {
         return $this->select('
-            SUM(CASE WHEN apsperstyle.sisa > 0 THEN apsperstyle.sisa/24 ELSE 0 END) AS sisa,
-            SUM(CASE WHEN apsperstyle.sisa = apsperstyle.qty THEN apsperstyle.sisa / 24 ELSE 0 END) AS sisa_blm_jln,
+           SUM(qty/24) AS qty, 
+            SUM(CASE WHEN sisa > 0 THEN sisa/24 ELSE 0 END) AS sisa,
             data_model.kd_buyer_order
         ')
             ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
@@ -1632,7 +1652,7 @@ class ApsPerstyleModel extends Model
     }
     public function getStatusOrder($noModel)
     {
-        return $this->select('apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.country, apsperstyle.delivery, apsperstyle.factory, apsperstyle.qty, apsperstyle.sisa, apsperstyle.po_plus')
+        return $this->select('apsperstyle.idapsperstyle, apsperstyle.machinetypeid, apsperstyle.mastermodel, apsperstyle.inisial, apsperstyle.size, apsperstyle.color, apsperstyle.country, apsperstyle.delivery, apsperstyle.factory, apsperstyle.qty, apsperstyle.sisa, apsperstyle.po_plus, apsperstyle.smv')
             ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
             ->where('apsperstyle.mastermodel', $noModel)
             ->where('apsperstyle.qty <>', 0)
@@ -1644,7 +1664,7 @@ class ApsPerstyleModel extends Model
     public function getDataOrderFetch($listNoModel)
     {
         return $this->db->table('apsperstyle')
-            ->select('idapsperstyle, inisial, size, mastermodel, delivery, qty')
+            ->select('idapsperstyle, inisial, size, mastermodel, delivery, qty, factory')
             ->whereIn('mastermodel', $listNoModel)
             ->get()
             ->getResultArray();
@@ -1686,6 +1706,28 @@ class ApsPerstyleModel extends Model
         return $this->select('mastermodel, size, qty')
             ->whereIn('mastermodel', $noModel)
             ->where('qty >', 0)
+            ->findAll();
+    }
+    public function getWarnaSmv(array $models)
+    {
+        return $this->select('mastermodel, size, color, smv')
+            ->whereIn('mastermodel', $models)
+            ->groupBy('mastermodel')
+            ->groupBy('size')
+            ->get()
+            ->getResultArray();
+    }
+    public function getNoModelJalan($area)
+    {
+        return $this->select('apsperstyle.mastermodel')
+            ->distinct()
+            ->join(
+                'produksi',
+                'produksi.idapsperstyle = apsperstyle.idapsperstyle',
+                'inner'
+            )
+            ->where('apsperstyle.factory', $area)
+            ->orderBy('apsperstyle.mastermodel', 'ASC')
             ->findAll();
     }
 }

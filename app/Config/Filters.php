@@ -2,6 +2,7 @@
 
 namespace Config;
 
+use App\Filters\AuditAutoFilter;
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\Filters\CSRF;
 use CodeIgniter\Filters\DebugToolbar;
@@ -34,6 +35,7 @@ class Filters extends BaseConfig
         'cors' => \App\Filters\CorsFilter::class,
         'rosso' => \App\Filters\RossoFilter::class,
         'followup' => \App\Filters\FollowUp::class,
+        'audit' => \App\Filters\AuditAutoFilter::class,
 
     ];
 
@@ -46,12 +48,14 @@ class Filters extends BaseConfig
     public array $globals = [
         'before' => [
             'cors',
+            'audit',
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',
         ],
         'after' => [
             'toolbar',
+            'audit',
             // 'honeypot',
             // 'secureheaders',
         ],
