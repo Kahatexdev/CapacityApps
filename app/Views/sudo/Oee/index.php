@@ -284,9 +284,7 @@
 
         let rows = '';
         data.detail.forEach(r => {
-            rows += `
-                <tr>
-                    <td>${r.jarum}</td>
+            rows += `<tr> <td>${r.jarum}</td>
                     <td>${r.no_mc}</td>
                     <td>${r.total_time}</td>
                     <td>${r.operating_time}</td>
@@ -310,6 +308,7 @@
             .replace(/TIDAK ADA\(\d+\)/gi, '') // jaga-jaga kalau sendirian
             .trim();
     }
+
 
 
 

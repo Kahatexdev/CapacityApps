@@ -2257,20 +2257,137 @@ class MaterialController extends BaseController
     }
     public function filterDatangBenang()
     {
-        $key = $this->request->getGet('key');
-        $tanggalAwal = $this->request->getGet('tanggal_awal');
+        $key          = $this->request->getGet('key');
+        $tanggalAwal  = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
-        $poPlus = $this->request->getGet('po_plus');
+        $poPlus       = $this->request->getGet('po_plus');
 
-        $apiUrl = api_url('material') . 'filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir . '&po_plus=' . $poPlus;
-        $material = @file_get_contents($apiUrl);
+        /**
+         * 1. Ambil data BON
+         */
+        $apiUrl = api_url('material') . 'filterDatangBenang'
+            . '?key=' . urlencode($key)
+            . '&tanggal_awal=' . $tanggalAwal
+            . '&tanggal_akhir=' . $tanggalAkhir
+            . '&po_plus=' . $poPlus;
 
-        $models = [];
-        if ($material !== FALSE) {
-            $models = json_decode($material, true);
+        $response = @file_get_contents($apiUrl);
+        $data = $response ? json_decode($response, true) : [];
+
+        if (empty($data)) {
+            return $this->response->setJSON([]);
         }
 
-        return $this->response->setJSON($models);
+        /**
+         * 2. Ambil QTY PCS per model + size (SAMA DENGAN MATERIAL)
+         */
+        $noModels = array_unique(array_column($data, 'no_model'));
+        $qtyPcsRaw = $this->ApsPerstyleModel->getQtyOrderByNoModel($noModels);
+
+        $sumQtyBySize = [];
+        foreach ($qtyPcsRaw as $row) {
+            $model = $row['mastermodel'];
+            $size  = $row['size'];
+            $qty   = (int) $row['qty'];
+
+            $sumQtyBySize[$model][$size] =
+                ($sumQtyBySize[$model][$size] ?? 0) + $qty;
+        }
+
+        /**
+         * 3. SIAPKAN CACHE STYLE SIZE (PER KOMBINASI VALID)
+         */
+        $styleKeyMap = [];
+
+        foreach ($data as $dt) {
+            $keyStyle = implode('|', [
+                $dt['no_model'],
+                $dt['item_type'],
+                $dt['kode_warna'],
+                $dt['warna']
+            ]);
+
+            if (!isset($styleKeyMap[$keyStyle])) {
+                $styleKeyMap[$keyStyle] = [
+                    'no_model'   => $dt['no_model'],
+                    'item_type'  => $dt['item_type'],
+                    'kode_warna' => $dt['kode_warna'],
+                    'warna'      => $dt['warna'],
+                ];
+            }
+        }
+
+        /**
+         * 4. HIT API STYLE SIZE (SEKALI PER KOMBINASI)
+         */
+        $styleMap = [];
+
+        foreach ($styleKeyMap as $keyStyle => $param) {
+
+            $styleUrl = api_url('material') . 'getStyleSizeByBbv2'
+                . '?no_model=' . urlencode($param['no_model'])
+                . '&item_type=' . urlencode($param['item_type'])
+                . '&kode_warna=' . urlencode($param['kode_warna'])
+                . '&warna=' . urlencode($param['warna']);
+
+            $styleResponse = @file_get_contents($styleUrl);
+            $styles = $styleResponse ? json_decode($styleResponse, true) : [];
+
+            $styleMap[$keyStyle] = $styles;
+        }
+
+        /**
+         * 5. HITUNG KGS PER BARIS MATERIAL (RUMUS IDENTIK)
+         */
+        foreach ($data as $i => $dt) {
+
+            $keyStyle = implode('|', [
+                $dt['no_model'],
+                $dt['item_type'],
+                $dt['kode_warna'],
+                $dt['warna']
+            ]);
+
+            $styles = $styleMap[$keyStyle] ?? [];
+
+            $ttlKgs = 0;
+            $ttlQty = 0;
+
+            foreach ($styles as $style) {
+
+                $styleSize = $style['style_size'];
+                $qty = $sumQtyBySize[$dt['no_model']][$styleSize] ?? 0;
+
+                if ($qty <= 0) {
+                    continue;
+                }
+
+                /**
+                 * RUMUS IDENTIK MATERIAL / EXCEL
+                 */
+                if (
+                    isset($style['item_type'])
+                    && stripos($style['item_type'], 'JHT') !== false
+                ) {
+                    $kebutuhan = (float) ($style['kgs'] ?? 0);
+                } else {
+                    $kebutuhan = (
+                        ($qty * $style['gw'] * $style['composition'] / 100 / 1000)
+                        * (1 + ($style['loss'] / 100))
+                    );
+                }
+
+                $ttlKgs += $kebutuhan;
+                $ttlQty += $qty;
+            }
+
+            /**
+             * 6. INJECT KE DATA
+             */
+            $data[$i]['kgs_material'] = round($ttlKgs, 2);
+        }
+
+        return $this->response->setJSON($data);
     }
     public function reportPoBenang()
     {

@@ -1724,7 +1724,7 @@ class ApsPerstyleModel extends Model
             ->join(
                 'produksi',
                 'produksi.idapsperstyle = apsperstyle.idapsperstyle',
-                'inner'
+                'left'
             )
             ->where('apsperstyle.factory', $area)
             ->orderBy('apsperstyle.mastermodel', 'ASC')

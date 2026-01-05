@@ -8674,52 +8674,168 @@ class ExcelController extends BaseController
     }
 
     public function exportDatangBenang()
-    {
-        $key = $this->request->getGet('key');
-        $tanggalAwal = $this->request->getGet('tanggal_awal');
-        $tanggalAkhir = $this->request->getGet('tanggal_akhir');
-        $poPlus = $this->request->getGet('po_plus');
+{
+    $key          = $this->request->getGet('key');
+    $tanggalAwal  = $this->request->getGet('tanggal_awal');
+    $tanggalAkhir = $this->request->getGet('tanggal_akhir');
+    $poPlus       = $this->request->getGet('po_plus');
 
-        $apiUrl = api_url('material') . 'filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir . '&po_plus=' . $poPlus;
+    /**
+     * 1. AMBIL DATA BON (MENTAH, TANPA KGS MATERIAL)
+     */
+    $apiUrl = api_url('material') . 'filterDatangBenang'
+        . '?key=' . urlencode($key)
+        . '&tanggal_awal=' . $tanggalAwal
+        . '&tanggal_akhir=' . $tanggalAkhir
+        . '&po_plus=' . $poPlus;
 
-        $material = @file_get_contents($apiUrl);
+    $response = @file_get_contents($apiUrl);
+    $data = $response ? json_decode($response, true) : [];
 
-        // $models = [];
-        if ($material !== FALSE) {
-            $data = json_decode($material, true);
+    if (empty($data)) {
+        return;
+    }
+
+    /**
+     * 2. AMBIL QTY PCS (SAMA PERSIS DENGAN CONTROLLER)
+     */
+    $noModels = array_unique(array_column($data, 'no_model'));
+    $qtyPcsRaw = $this->ApsPerstyleModel->getQtyOrderByNoModel($noModels);
+
+    $sumQtyBySize = [];
+    foreach ($qtyPcsRaw as $row) {
+        $model = $row['mastermodel'];
+        $size  = $row['size'];
+        $qty   = (int) $row['qty'];
+
+        $sumQtyBySize[$model][$size] =
+            ($sumQtyBySize[$model][$size] ?? 0) + $qty;
+    }
+
+    /**
+     * 3. SIAPKAN KOMBINASI STYLE (CACHE KEY)
+     */
+    $styleKeyMap = [];
+
+    foreach ($data as $dt) {
+        $keyStyle = implode('|', [
+            $dt['no_model'],
+            $dt['item_type'],
+            $dt['kode_warna'],
+            $dt['warna']
+        ]);
+
+        if (!isset($styleKeyMap[$keyStyle])) {
+            $styleKeyMap[$keyStyle] = [
+                'no_model'   => $dt['no_model'],
+                'item_type'  => $dt['item_type'],
+                'kode_warna' => $dt['kode_warna'],
+                'warna'      => $dt['warna'],
+            ];
+        }
+    }
+
+    /**
+     * 4. HIT STYLE SIZE API (SEKALI PER KOMBINASI)
+     */
+    $styleMap = [];
+
+    foreach ($styleKeyMap as $keyStyle => $param) {
+
+        $styleUrl = api_url('material') . 'getStyleSizeByBbv2'
+            . '?no_model=' . urlencode($param['no_model'])
+            . '&item_type=' . urlencode($param['item_type'])
+            . '&kode_warna=' . urlencode($param['kode_warna'])
+            . '&warna=' . urlencode($param['warna']);
+
+        $styleResponse = @file_get_contents($styleUrl);
+        $styleMap[$keyStyle] = $styleResponse
+            ? json_decode($styleResponse, true)
+            : [];
+    }
+
+    /**
+     * 5. HITUNG KGS MATERIAL (RUMUS IDENTIK)
+     */
+    foreach ($data as $i => $dt) {
+
+        $keyStyle = implode('|', [
+            $dt['no_model'],
+            $dt['item_type'],
+            $dt['kode_warna'],
+            $dt['warna']
+        ]);
+
+        $styles = $styleMap[$keyStyle] ?? [];
+
+        $ttlKgs = 0;
+
+        foreach ($styles as $style) {
+
+            $styleSize = $style['style_size'];
+            $qty = $sumQtyBySize[$dt['no_model']][$styleSize] ?? 0;
+
+            if ($qty <= 0) {
+                continue;
+            }
+
+            if (
+                isset($style['item_type'])
+                && stripos($style['item_type'], 'JHT') !== false
+            ) {
+                $kebutuhan = (float) ($style['kgs'] ?? 0);
+            } else {
+                $kebutuhan = (
+                    ($qty * $style['gw'] * $style['composition'] / 100 / 1000)
+                    * (1 + ($style['loss'] / 100))
+                );
+            }
+
+            $ttlKgs += $kebutuhan;
         }
 
-        // $data = $this->pemasukanModel->getFilterDatangBenang($key, $tanggal_awal, $tanggal_akhir);
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+        $data[$i]['kgs_material'] = round($ttlKgs, 2);
+    }
 
-        // Judul
-        $sheet->setCellValue('A1', 'Datang Benang');
-        $sheet->mergeCells('A1:V1'); // Menggabungkan sel untuk judul
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+    /**
+     * =========================
+     * 6. EXPORT KE EXCEL
+     * =========================
+     */
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
 
-        // Header
-        $header = ["No", "Foll Up", "No Model", "No Order", "Buyer", "Delivery Awal", "Delivery Akhir", "Order Type", "Item Type", "Kode Warna", "Warna", "KG Pesan", "Tanggal Datang", "Kgs Datang", "Cones Datang", "LOT Datang", "No Surat Jalan", "LMD", "GW", "Harga", "Nama Cluster", "Po Tambahan"];
-        $sheet->fromArray([$header], NULL, 'A3');
+    $sheet->setCellValue('A1', 'Datang Benang');
+    $sheet->mergeCells('A1:Y1');
+    $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+    $sheet->getStyle('A1')->getAlignment()
+        ->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Styling Header
-        $sheet->getStyle('A3:V3')->getFont()->setBold(true);
-        $sheet->getStyle('A3:V3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A3:V3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+    $header = ["No", "Foll Up", "No Model", "No Order", "Buyer", "Delivery Awal", "Delivery Akhir", "Order Type", "Item Type", "Kode Warna", "Warna", "KG Pesan", "Tanggal Datang", "Kgs Datang", "Cones Datang", "LOT Datang", "No Surat Jalan", "LMD", "GW", "Harga", "Nama Cluster", "PO Tambahan", "Ganti Retur", "Waktu Input", "Admin"];
+    $sheet->fromArray([$header], null, 'A3');
 
-        // Data
-        $row = 4;
-        foreach ($data as $index => $item) {
+     // Styling Header
+        $sheet->getStyle('A3:Y3')->getFont()->setBold(true);
+        $sheet->getStyle('A3:Y3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A3:Y3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        
+    $row = 4;
+    foreach ($data as $i => $item) {
             $getPoPlus = $item['po_plus'];
+            $getGantiRetur = $item['ganti_retur'];
             if ($getPoPlus == 1) {
                 $poPlus = 'YA';
             } else {
                 $poPlus = '';
             }
+            if ($getGantiRetur == 1) {
+                $gantiRetur = 'YA';
+            } else {
+                $gantiRetur = '';
+            }
             $sheet->fromArray([
                 [
-                    $index + 1,
+                    $i + 1,
                     $item['foll_up'],
                     $item['no_model'],
                     $item['no_order'],
@@ -8741,12 +8857,15 @@ class ExcelController extends BaseController
                     number_format($item['harga'], 2),
                     $item['nama_cluster'],
                     $poPlus,
+                    $gantiRetur,
+                    $item['created_at'],
+                    $item['admin']
                 ]
             ], NULL, 'A' . $row);
             $row++;
         }
 
-        // Atur border untuk seluruh tabel
+     // Atur border untuk seluruh tabel
         $styleArray = [
             'borders' => [
                 'allBorders' => [
@@ -8755,27 +8874,28 @@ class ExcelController extends BaseController
                 ],
             ],
         ];
-        $sheet->getStyle('A3:V' . ($row - 1))->applyFromArray($styleArray);
+        $sheet->getStyle('A3:Y' . ($row - 1))->applyFromArray($styleArray);
 
         // Set auto width untuk setiap kolom
-        foreach (range('A', 'V') as $column) {
+        foreach (range('A', 'Y') as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 
         // Set isi tabel agar rata tengah
-        $sheet->getStyle('A4:V' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A4:V' . ($row - 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A4:Y' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A4:Y' . ($row - 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
-        $writer = new Xlsx($spreadsheet);
-        $fileName = 'Report_Datang_Benang_' . date('Y-m-d') . '.xlsx';
+    $writer = new Xlsx($spreadsheet);
+    $fileName = 'Report_Datang_Benang_' . date('Y-m-d') . '.xlsx';
 
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="' . $fileName . '"');
-        header('Cache-Control: max-age=0');
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="' . $fileName . '"');
+    header('Cache-Control: max-age=0');
 
-        $writer->save('php://output');
-        exit;
-    }
+    $writer->save('php://output');
+    exit;
+}
+
     public function exportPoBenang()
     {
         $key = $this->request->getGet('key');
