@@ -750,6 +750,12 @@ class ProduksiModel extends Model
                 SUM(bs_mesin.qty_gram) AS qty_gram
             FROM bs_mesin
             LEFT JOIN data_model dm ON dm.no_model=bs_mesin.no_model
+            INNER JOIN 
+                    (SELECT mastermodel, size 
+                    FROM apsperstyle 
+                    WHERE qty > 0 
+                    GROUP BY mastermodel, size) aps 
+                    ON aps.mastermodel = bs_mesin.no_model AND aps.size = bs_mesin.size
             WHERE bs_mesin.area = :area:
             $buyerFilter
             AND MONTH(bs_mesin.tanggal_produksi) = :bulan:
