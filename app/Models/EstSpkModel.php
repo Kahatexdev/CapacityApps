@@ -85,7 +85,7 @@ class EstSpkModel extends Model
             ->findAll();
     }
 
-    public function getHistorySpk($start, $length, $search, $orderColumn, $orderDir)
+    public function getHistorySpk($start, $length, $search, $orderColumn, $orderDir, $filters)
     {
         $builder = $this->db->table('estimasi_spk');
 
@@ -109,6 +109,19 @@ class EstSpkModel extends Model
                 ->orLike('status', $search)
                 ->groupEnd();
         }
+
+        if (!empty($filters['tgl'])) {
+            $builder->where('DATE(created_at)', $filters['tgl']);
+        }
+
+        if (!empty($filters['no_model'])) {
+            $builder->like('model', $filters['no_model']);
+        }
+
+        if (!empty($filters['style'])) {
+            $builder->like('style', $filters['style']);
+        }
+
 
         $builder->orderBy($orderColumn, $orderDir);
         $builder->limit($length, $start);
@@ -136,5 +149,37 @@ class EstSpkModel extends Model
         }
 
         return $builder->countAllResults();
+    }
+
+    public function getHistorySpkExport($filters)
+    {
+        $builder = $this->db->table('estimasi_spk');
+
+        // SELECT: boleh SQL function
+        $builder->select("
+            DATE(created_at) AS tgl_buat,
+            TIME(created_at) AS jam,
+            model,
+            style,
+            area,
+            qty,
+            status,
+            keterangan
+        ")->whereIn('status', ['Ditolak', 'approved']);
+        // data filter
+        if (!empty($filters['tgl'])) {
+            $builder->where('DATE(created_at)', $filters['tgl']);
+        }
+
+        if (!empty($filters['no_model'])) {
+            $builder->like('model', $filters['no_model']);
+        }
+
+        if (!empty($filters['style'])) {
+            $builder->like('style', $filters['style']);
+        }
+
+        $builder->orderBy('tgl_buat, model, style');
+        return $builder->get()->getResultArray();
     }
 }
