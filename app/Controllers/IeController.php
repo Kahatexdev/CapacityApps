@@ -131,4 +131,17 @@ class IeController extends BaseController
             'data' => array_values($data)
         ]);
     }
+
+    public function dataMontir()
+    {
+        $role = session()->get('role');
+        $data = [
+            'role' => session()->get('role'),
+            'title' => 'Dashboard',
+            'active1' => 'active',
+            'active2' => '',
+
+        ];
+        return view($role . '/Karyawan/index', $data);
+    }
 }
