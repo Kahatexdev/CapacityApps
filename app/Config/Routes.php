@@ -1276,6 +1276,9 @@ $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
     
     // datamontir
     $routes->get('dataMontir', 'IeController::dataMontir');
+
+    // oee
+    $routes->get('oee', 'OEEController::index');
 });
 
 // rosso
