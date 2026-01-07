@@ -260,7 +260,7 @@ $this->extend($role . '/layout'); ?>
         });
         var tableHistory = $('#exampleHistory').DataTable({
             "order": [
-                [4, 'desc'] // Urutkan kolom pertama secara descending
+                [5, 'desc'] // Urutkan kolom pertama secara descending
             ]
         });
 
