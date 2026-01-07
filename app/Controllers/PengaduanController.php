@@ -10,9 +10,57 @@ use CodeIgniter\API\ResponseTrait;
 
 class PengaduanController extends BaseController
 {
-
-
     public function __construct() {}
+
+    public function getpengaduan()
+    {
+        $role   = session()->get('role');
+        $idUser = session()->get('id_user');
+
+        $url = api_url('complaint') . 'chat/messages/' . $idUser. '?role=' . $role;
+        $url2 = api_url('complaint') . 'getRole';
+        // dd($url);
+        try {
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 5
+                ]
+            ]);
+
+            $json = @file_get_contents($url, false, $context);
+            $jsonRole = @file_get_contents($url2, false, $context);
+            if ($json === false) {
+                throw new \Exception('Gagal mengambil data dari API');
+            }
+
+            $threads = json_decode($json, true);
+            $roles = json_decode($jsonRole, true);
+            if (!is_array($threads)) {
+                throw new \Exception('Format response API tidak valid');
+            }
+            return view($role . '/pengaduan/index', [
+                'threads' => $threads, // ✅ tetap sama
+                'roles' => $roles,
+                'role'    => $role,
+                'title'   => 'Pengaduan',
+                'active'  => $this->active,
+                'active1'  => $this->active,
+            ]);
+
+        } catch (\Throwable $e) {
+            log_message('error', 'API pengaduan error: ' . $e->getMessage());
+
+            return view($role . '/pengaduan/index', [
+                'threads' => [],
+                'roles' => [],
+                'error'   => 'Tidak dapat memuat pengaduan',
+                'role'    => $role,
+                'title'   => 'Pengaduan',
+                'active'  => $this->active,
+                'active1'  => $this->active
+            ]);
+        }
+    }
 
     public function index()
     {

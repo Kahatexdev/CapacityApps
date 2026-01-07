@@ -55,10 +55,31 @@ Events::on('pre_system', static function () {
     Events::on('post_controller_constructor', function () {
         $renderer = Services::renderer();
 
-        $pengaduanModel = new \App\Models\PengaduanModel();
-        $role = session()->get('role');
-        $countNotif = $pengaduanModel->countNotif($role);
+        $idUser = session()->get('id_user');
 
-        $renderer->setVar('countNotif', $countNotif);
+        if (!$idUser) {
+            $renderer->setVar('countNotif', 0);
+            return;
+        }
+
+        try {
+            $client = Services::curlrequest([
+                'timeout' => 2,
+            ]);
+
+            $response = $client->get(
+                'http://172.23.39.117/ComplaintSystem/public/api/chat/unread/' . $idUser
+            );
+
+            $data = json_decode($response->getBody(), true);
+
+            $renderer->setVar(
+                'countNotif',
+                $data['data']['unread_messages'] ?? 0
+            );
+        } catch (\Throwable $e) {
+            log_message('error', 'Notif API error: ' . $e->getMessage());
+            $renderer->setVar('countNotif', 0);
+        }
     });
 });

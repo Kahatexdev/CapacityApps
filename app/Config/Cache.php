@@ -127,7 +127,7 @@ class Cache extends BaseConfig
      * @var array<string, bool|int|string>
      */
     public array $memcached = [
-        'host'   => '192.168.1.5',
+        'host'   => '172.23.39.117',
         'port'   => 11211,
         'weight' => 1,
         'raw'    => false,
@@ -143,7 +143,7 @@ class Cache extends BaseConfig
      * @var array<string, int|string|null>
      */
     public array $redis = [
-        'host'     => '192.168.1.5',
+        'host'     => '172.23.39.117',
         'password' => null,
         'port'     => 6379,
         'timeout'  => 0,

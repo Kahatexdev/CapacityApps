@@ -447,6 +447,7 @@
     <script src="<?= base_url('assets/js/plugins/perfect-scrollbar.min.js') ?>"></script>
     <script src="<?= base_url('assets/js/plugins/smooth-scrollbar.min.js') ?>"></script>
     <script>
+        const ComplaintUrl = "<?= $complaintApiUrl ?>";
         const MaterialUrl = "<?= $materialApiUrl ?>";
         const HrisUrl = "<?= $hrisApiUrl ?>";
         const TlsUrl = "<?= $tlsApiUrl ?>";

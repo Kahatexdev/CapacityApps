@@ -101,7 +101,7 @@ class AuthController extends BaseController
         $client = service('curlrequest');
 
         $response = $client->post(
-            'http://192.168.1.5/ComplaintSystem/public/api/login',
+            'http://172.23.39.117/ComplaintSystem/public/api/login',
             [
                 'http_errors' => false, // 🔥 PENTING
                 'form_params' => [
@@ -157,7 +157,7 @@ class AuthController extends BaseController
             try {
                 $client = service('curlrequest');
                 $client->post(
-                    'http://192.168.1.5/ComplaintSystem/public/api/logout',
+                    'http://172.23.39.117/ComplaintSystem/public/api/logout',
                     [
                         'headers' => [
                             'Authorization' => 'Bearer ' . $token
@@ -181,7 +181,7 @@ class AuthController extends BaseController
         $client = service('curlrequest');
 
         $response = $client->get(
-            'http://192.168.1.5/ComplaintSystem/public/api/CS/user',
+            'http://172.23.39.117/ComplaintSystem/public/api/CS/user',
             ['http_errors' => false]
         );
 

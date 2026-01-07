@@ -121,6 +121,7 @@ abstract class BaseController extends Controller
     protected $MesinPerStyleModel;
     protected $downtimeModel;
     protected $detailAreaMc;
+    protected $urlComplaint;
     protected $urlMaterial;
     protected $urlHris;
     protected $urlTls;
@@ -162,9 +163,11 @@ abstract class BaseController extends Controller
         LoggerInterface $logger
     ) {
         parent::initController($request, $response, $logger);
+        service('renderer')->setVar('complaintApiUrl', api_url('complaint'));
         service('renderer')->setVar('materialApiUrl', api_url('material'));
         service('renderer')->setVar('hrisApiUrl', api_url('hris'));
         service('renderer')->setVar('tlsApiUrl', api_url('tls'));
+        
         $this->db = \Config\Database::connect();
         $this->jarumModel = new DataMesinModel();
         $this->bookingModel = new BookingModel();

@@ -1209,7 +1209,7 @@ $routes->group('/sudo',['filter' => 'auth.token'], function ($routes) {
     $routes->get('chat', 'ChatController::pesan');
 
     // pengaduan
-    $routes->get('pengaduan', 'PengaduanController::index');
+    $routes->get('pengaduan', 'PengaduanController::getpengaduan');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
 
