@@ -69,6 +69,7 @@
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">BS Stocklot</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">(+) Packing</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty Minta</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Keterangan</th>
 
                                 </tr>
                             </thead>
@@ -85,6 +86,7 @@
                                         <td class="text-center"><?= $row['deffect'] ?> pcs</td>
                                         <td class="text-center"><?= $row['plus_packing'] ?> pcs</td>
                                         <td class="text-center"><?= $row['qty'] ?> pcs</td>
+                                        <td class="text-center"><?= $row['keterangan'] ?> </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -106,23 +108,12 @@
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Style</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Area</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Keterangan</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Status</th>
 
                                 </tr>
                             </thead>
-                            <tbody>
-                                <?php foreach ($history as $row1) : ?>
-                                    <tr>
-                                        <td class="text-center"><?= $row1['tgl_buat'] ?></td>
-                                        <td class="text-center"><?= $row1['jam'] ?></td>
-                                        <td class="text-center"><?= $row1['model'] ?></td>
-                                        <td class="text-center"><?= $row1['style'] ?></td>
-                                        <td class="text-center"><?= $row1['area'] ?></td>
-                                        <td class="text-center"><?= $row1['qty'] ?> pcs</td>
-                                        <td class="text-center"><?= $row1['status'] ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
+
                         </table>
                     </div>
                 </div>
@@ -159,17 +150,14 @@
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        // Inisialisasi DataTable dengan opsi yang diinginkan
+
         var table = $('#example').DataTable({
             "order": [
-                [0, 'desc'] // Urutkan kolom pertama secara descending
-            ]
+                [0, 'desc']
+            ],
+            "length": 50,
         });
-        var table1 = $('#example1').DataTable({
-            "order": [
-                [0, 'desc'] // Urutkan kolom pertama secara descending
-            ]
-        });
+
 
         // Saat klik "select all", pilih semua checkbox pada baris yang tampil (mengikuti order & filter)
         $('#select-all').on('click', function() {
@@ -244,6 +232,78 @@
             // Tambahkan form ke body dan submit
             $('body').append(form);
             form.submit();
+        });
+
+    });
+    $(document).ready(function() {
+
+        $('#example1').DataTable({
+            processing: true,
+            serverSide: true,
+            searching: true,
+            ordering: true,
+            lengthChange: true,
+            pageLength: 50,
+
+            ajax: {
+                url: "<?= base_url($role . '/historySpk') ?>",
+                type: "POST"
+            },
+
+            // URUTAN KOLOM HARUS SAMA DENGAN <th>
+            columns: [{
+                    data: 'tgl_buat',
+                    className: 'text-center'
+                },
+                {
+                    data: 'jam',
+                    className: 'text-center'
+                },
+                {
+                    data: 'model',
+                    className: 'text-center'
+                },
+                {
+                    data: 'style',
+                    className: 'text-center'
+                },
+                {
+                    data: 'area',
+                    className: 'text-center'
+                },
+
+                {
+                    data: 'qty',
+                    className: 'text-center',
+                    render: function(data, type, row) {
+                        return data + ' pcs';
+                    }
+                },
+                {
+                    data: 'keterangan',
+                    className: 'text-center'
+                },
+                {
+                    data: 'status',
+                    className: 'text-center',
+                    render: function(data) {
+                        // optional styling
+                        if (data === 'Approved') {
+                            return '<span class="badge bg-success">' + data + '</span>';
+                        }
+                        return '<span class="badge bg-secondary">' + data + '</span>';
+                    }
+                }
+            ],
+
+            order: [
+                [0, 'desc']
+            ], // default order by tanggal
+
+            // BIAR GA ERROR DI CONSOLE KALO DATA KOSONG
+            language: {
+                emptyTable: "Data tidak tersedia"
+            }
         });
 
     });

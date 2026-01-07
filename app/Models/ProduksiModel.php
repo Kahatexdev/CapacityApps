@@ -750,6 +750,12 @@ class ProduksiModel extends Model
                 SUM(bs_mesin.qty_gram) AS qty_gram
             FROM bs_mesin
             LEFT JOIN data_model dm ON dm.no_model=bs_mesin.no_model
+            INNER JOIN 
+                    (SELECT mastermodel, size 
+                    FROM apsperstyle 
+                    WHERE qty > 0 
+                    GROUP BY mastermodel, size) aps 
+                    ON aps.mastermodel = bs_mesin.no_model AND aps.size = bs_mesin.size
             WHERE bs_mesin.area = :area:
             $buyerFilter
             AND MONTH(bs_mesin.tanggal_produksi) = :bulan:
@@ -922,5 +928,31 @@ class ProduksiModel extends Model
         }
 
         return $indexed;
+    }
+    public function getProdBulkByModelSize(array $keys)
+    {
+        // ================= SUBQUERY PRODUKSI =================
+        $subProd = $this->db->table('produksi')
+            ->select('idapsperstyle, SUM(qty_produksi) AS prod')
+            ->groupBy('idapsperstyle');
+
+        // ================= SUBQUERY BS =================
+        $subBs = $this->db->table('data_bs')
+            ->select('idapsperstyle, SUM(qty) AS bs')
+            ->groupBy('idapsperstyle');
+
+        return $this->db->table('apsperstyle aps')
+            ->select("
+            aps.mastermodel,
+            aps.size,
+            SUM(p.prod) AS prod,
+            SUM(b.bs) AS bs
+        ")
+            ->join("({$subProd->getCompiledSelect()}) p", 'p.idapsperstyle = aps.idapsperstyle', 'left')
+            ->join("({$subBs->getCompiledSelect()}) b", 'b.idapsperstyle = aps.idapsperstyle', 'left')
+            ->whereIn("CONCAT(aps.mastermodel, '_', aps.size)", $keys)
+            ->groupBy('aps.mastermodel, aps.size')
+            ->get()
+            ->getResultArray();
     }
 }

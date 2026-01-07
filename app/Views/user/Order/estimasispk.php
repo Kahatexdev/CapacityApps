@@ -98,8 +98,7 @@ $this->extend($role . '/layout'); ?>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">BS Stocklot</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">PO+</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Estimasi SPK 2</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
-                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Waktu Minta</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">keterangan</th>
 
                                 </tr>
                             </thead>
@@ -125,8 +124,13 @@ $this->extend($role . '/layout'); ?>
                                         <td class="text-xs">
                                             <input type="number" name="row[<?= $index ?>][estimasi]" value="<?= $item['estimasi'] ?>" class="form-control"> pcs
                                         </td>
-                                        <td class="text-xs"><?= $item['status']; ?></td>
-                                        <td class="text-xs"><?= $item['waktu']; ?></td>
+                                        <td class="text-xs" style="min-width: 250px;">
+                                            <textarea
+                                                name="row[<?= $index ?>][keterangan]"
+                                                class="form-control"
+                                                rows="2"
+                                                placeholder="Keterangan..."></textarea>
+                                        </td>
 
                                         <!-- Hidden inputs -->
                                         <input type="hidden" name="row[<?= $index ?>][model]" value="<?= $item['model'] ?>">
@@ -155,6 +159,7 @@ $this->extend($role . '/layout'); ?>
                                     <th class="text-center">No Model</th>
                                     <th class="text-center">Style Size</th>
                                     <th class="text-center">Qty</th>
+                                    <th class="text-center">Keterangan</th>
                                     <th class="text-center">
                                         <button type="button" class="btn btn-info" id="addRow">
                                             <i class="fas fa-plus"></i>
@@ -178,6 +183,7 @@ $this->extend($role . '/layout'); ?>
                                         </select>
                                     </td>
                                     <td><input type="number" class="form-control" name="qty[]" required></td>
+                                    <td><textarea class="form-control" name="keterangan[]" required> </textarea></td>
                                     <input type="hidden" class="form-control" name="area[]" value="<?= $area ?>" required>
                                     <td class="text-center">
                                         <!-- Row pertama tidak bisa dihapus -->
@@ -202,6 +208,7 @@ $this->extend($role . '/layout'); ?>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7">No Model</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Style</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Qty</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Keterangan</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2">Tanggal</th>
 
@@ -214,6 +221,7 @@ $this->extend($role . '/layout'); ?>
                                         <td class="text-xs"><?= $item['model']; ?></td>
                                         <td class="text-xs"><?= $item['style']; ?></td>
                                         <td class="text-xs"><?= round($item['qty']); ?> pcs</td>
+                                        <td class="text-xs"><?= $item['keterangan']; ?></td>
                                         <td class="text-xs">
                                             <?php if ($item['status'] === 'approved'): ?>
                                                 <span class="badge bg-success text-white"><?= esc($item['status']); ?></span>
@@ -308,37 +316,40 @@ $this->extend($role . '/layout'); ?>
         $('#minta-btn').on('click', function(e) {
             e.preventDefault();
 
-            var table = $('#example').DataTable(); // Pastikan DataTables sudah di-inisialisasi
-            var selectedRows = [];
+            const table = $('#example').DataTable();
+            const selectedRows = [];
 
-            // Ambil semua baris yang sedang di-filter/pencarian aktif
-            var rows = table.rows({
+            // Ambil semua row yang lagi kena search / filter
+            const rows = table.rows({
                 search: 'applied'
             }).nodes();
 
             $('input[type="checkbox"][name^="row"][name$="[selected]"]', rows).each(function() {
-                if ($(this).prop('checked')) {
-                    let row = $(this).closest('tr');
-                    let data = {
-                        model: row.find('input[name$="[model]"]').val(),
-                        size: row.find('input[name$="[size]"]').val(),
-                        area: row.find('input[name$="[area]"]').val(),
-                        poplus: row.find('input[name$="[poplus]"]').val(),
-                        estimasi: row.find('input[name$="[estimasi]"]').val(),
-                    };
-                    selectedRows.push(data);
-                }
+                if (!$(this).is(':checked')) return;
+
+                const row = $(this).closest('tr');
+
+                const data = {
+                    model: row.find('input[name$="[model]"]').val() || '',
+                    size: row.find('input[name$="[size]"]').val() || '',
+                    area: row.find('input[name$="[area]"]').val() || '',
+                    poplus: Number(row.find('input[name$="[poplus]"]').val()) || 0,
+                    estimasi: Number(row.find('input[name$="[estimasi]"]').val()) || 0,
+                    keterangan: row.find('textarea[name$="[keterangan]"]').val() || '',
+                };
+
+                selectedRows.push(data);
             });
 
             if (selectedRows.length === 0) {
-                alert("Pilih minimal 1 data untuk di-minta.");
+                alert('Pilih minimal 1 data untuk di-minta.');
                 return;
             }
 
-            // Buat form dinamis dan submit POST ke controller
-            var form = $('<form>', {
+            // Buat form dinamis
+            const form = $('<form>', {
                 action: "<?= base_url($role . '/mintaSpk2') ?>",
-                method: "POST"
+                method: 'POST'
             });
 
             $.each(selectedRows, function(i, item) {
@@ -347,11 +358,13 @@ $this->extend($role . '/layout'); ?>
                 form.append(`<input type="hidden" name="data[${i}][area]" value="${item.area}">`);
                 form.append(`<input type="hidden" name="data[${i}][poplus]" value="${item.poplus}">`);
                 form.append(`<input type="hidden" name="data[${i}][estimasi]" value="${item.estimasi}">`);
+                form.append(`<input type="hidden" name="data[${i}][keterangan]" value="${item.keterangan}">`);
             });
 
             $('body').append(form);
             form.submit();
         });
+
         $('#export-btn').on('click', function(e) {
             e.preventDefault();
 
@@ -424,6 +437,9 @@ $this->extend($role . '/layout'); ?>
                 <td>
                     <input type="number" class="form-control" name="qty[]" required>
                 </td>
+                <td>
+                   <textarea class="form-control" name="keterangan[]" required> </textarea>
+                </td>
                     <input type="hidden" class="form-control" name="area[]" value="${area}" required>
 
                 <td class="text-center">
@@ -464,6 +480,7 @@ $this->extend($role . '/layout'); ?>
             const size = $(this).find('.size').val();
             const qty = $(this).find('input[name="qty[]"]').val();
             const area = $(this).find('input[name="area[]"]').val();
+            const keterangan = $(this).find('textarea[name="keterangan[]"]').val();
 
             if (!noModel || !size || !qty) {
                 valid = false;
@@ -474,7 +491,8 @@ $this->extend($role . '/layout'); ?>
                 no_model: noModel,
                 size: size,
                 area: area,
-                qty: qty
+                qty: qty,
+                keterangan: keterangan
             });
         });
 

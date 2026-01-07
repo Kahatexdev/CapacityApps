@@ -13,7 +13,7 @@ class EstSpkModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['model', 'style', 'area', 'qty', 'status'];
+    protected $allowedFields    = ['model', 'style', 'area', 'qty', 'status', 'keterangan'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -72,10 +72,69 @@ class EstSpkModel extends Model
             ->where('updated_at>', $lastmonth)
             ->findAll();
     }
-    public function getHistorySpk()
+    // public function getHistorySpk()
+    // {
+    //     return $this->select('estimasi_spk.*, DATE(updated_at) AS tgl_buat, TIME(created_at) as jam')
+    //         ->whereIn('status', ['Ditolak', 'approved'])
+    //         ->findAll();
+    // }
+    public function getStatusBulk(array $keys, $area)
     {
-        return $this->select('estimasi_spk.*, DATE(updated_at) AS tgl_buat, TIME(created_at) as jam')
-            ->whereIn('status', ['Ditolak', 'approved'])
+        return $this->where('area', $area)
+            ->whereIn('CONCAT(model, "_", style)', $keys)
             ->findAll();
+    }
+
+    public function getHistorySpk($start, $length, $search, $orderColumn, $orderDir)
+    {
+        $builder = $this->db->table('estimasi_spk');
+
+        // SELECT: boleh SQL function
+        $builder->select("
+        DATE(created_at) AS tgl_buat,
+        TIME(created_at) AS jam,
+        model,
+        style,
+        area,
+        qty,
+        status,
+        keterangan
+    ")->whereIn('status', ['Ditolak', 'approved']);
+
+        if ($search) {
+            $builder->groupStart()
+                ->like('model', $search)
+                ->orLike('style', $search)
+                ->orLike('area', $search)
+                ->orLike('status', $search)
+                ->groupEnd();
+        }
+
+        $builder->orderBy($orderColumn, $orderDir);
+        $builder->limit($length, $start);
+
+        return $builder->get()->getResultArray();
+    }
+
+    public function countHistorySpk()
+    {
+        return $this->db->table('estimasi_spk')->countAll();
+    }
+
+    public function countHistorySpkFiltered($search)
+    {
+        $builder = $this->db->table('estimasi_spk');
+
+        if ($search) {
+            $builder->groupStart()
+                ->whereIn('status', ['Ditolak', 'approved'])
+                ->like('model', $search)
+                ->orLike('style', $search)
+                ->orLike('area', $search)
+                ->orLike('status', $search)
+                ->groupEnd();
+        }
+
+        return $builder->countAllResults();
     }
 }
