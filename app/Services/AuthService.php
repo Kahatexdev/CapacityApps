@@ -9,7 +9,7 @@ class AuthService
     protected $userModel;
     protected $attemptModel;
 
-    const MAX_ATTEMPT = 3;
+    const MAX_ATTEMPT = 5;
     const LOCK_MINUTE = 15;
 
     public function __construct()
