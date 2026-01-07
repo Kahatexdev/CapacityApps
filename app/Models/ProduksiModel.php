@@ -929,4 +929,30 @@ class ProduksiModel extends Model
 
         return $indexed;
     }
+    public function getProdBulkByModelSize(array $keys)
+    {
+        // ================= SUBQUERY PRODUKSI =================
+        $subProd = $this->db->table('produksi')
+            ->select('idapsperstyle, SUM(qty_produksi) AS prod')
+            ->groupBy('idapsperstyle');
+
+        // ================= SUBQUERY BS =================
+        $subBs = $this->db->table('data_bs')
+            ->select('idapsperstyle, SUM(qty) AS bs')
+            ->groupBy('idapsperstyle');
+
+        return $this->db->table('apsperstyle aps')
+            ->select("
+            aps.mastermodel,
+            aps.size,
+            SUM(p.prod) AS prod,
+            SUM(b.bs) AS bs
+        ")
+            ->join("({$subProd->getCompiledSelect()}) p", 'p.idapsperstyle = aps.idapsperstyle', 'left')
+            ->join("({$subBs->getCompiledSelect()}) b", 'b.idapsperstyle = aps.idapsperstyle', 'left')
+            ->whereIn("CONCAT(aps.mastermodel, '_', aps.size)", $keys)
+            ->groupBy('aps.mastermodel, aps.size')
+            ->get()
+            ->getResultArray();
+    }
 }

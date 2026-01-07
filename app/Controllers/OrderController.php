@@ -2060,63 +2060,106 @@ class OrderController extends BaseController
     }
     public function estimasispk($area)
     {
-        $lastmonth = date('Y-m-01', strtotime('-2 month'));
-        $data = $this->ApsPerstyleModel->dataEstimasi($area, $lastmonth);
         $pdkArea = $this->ApsPerstyleModel->getModelArea($area);
-        $perStyle = [];
-        $requeseted = [];
+        $lastmonth = date('Y-m-01', strtotime('-2 month'));
         $history = $this->estspk->getHistory($area, $lastmonth);
-        foreach ($data as $id) {
 
-            // get data produksi
-            $dataProd = $this->produksiModel->getProdByPdkSize($id['mastermodel'], $id['size']);
-            $sudahMinta = $this->estspk->cekStatus($id['mastermodel'], $id['size'], $area);
+        // ================== DATA UTAMA ==================
+        $data = $this->ApsPerstyleModel->dataEstimasi($area, $lastmonth);
 
-            if ($sudahMinta) {
-                if ($sudahMinta['status'] === 'sudah') {
-                    $sudahMinta['status'] = 'Menunggu Acc';
-                }
-                $requeseted[] = [
-                    'model' => $sudahMinta['model'],
-                    'style' => $sudahMinta['style'],
-                    'area' => $sudahMinta['area'],
-                    'qty' => $sudahMinta['qty'],
-                    'status' => $sudahMinta['status'],
-                    'updated_at' => $sudahMinta['updated_at'],
-                ];
-            } else {
-
-                // Hitung nilai akumulasi awal
-                $bs =  (int)$dataProd['bs'];
-                $qty = (int)$id['qty'];
-                $sisa = (int)$id['sisa'];
-                $poplus = (int)$id['poplus'];
-                $produksi = $qty - $sisa;
-                $ttlProd = (int)$dataProd['prod'];
-                // Periksa apakah produksi valid dan memenuhi kondisi
-                if ($ttlProd > 0) {
-                    $percentage = round(($ttlProd / $qty) * 100);
-                    $ganti = $bs + $poplus;
-                    $estimasi = ($ganti / $ttlProd / 100) * $qty;
-                    $perStyle[] = [
-                        'model' => $id['mastermodel'],
-                        'inisial' => $id['inisial'],
-                        'size' => $id['size'],
-                        'sisa' => $sisa,
-                        'qty' => $qty,
-                        'ttlProd' => $ttlProd,
-                        'percentage' => $percentage,
-                        'bs' => $bs,
-                        'poplus' => $poplus,
-                        'jarum' => $id['machinetypeid'],
-                        'estimasi' => round(($estimasi * 100), 1),
-                        'status' => 'belum',
-                        'waktu' => '-'
-                    ];
-                }
-            }
+        if (empty($data)) {
+            return view('estimasi/index', [
+                'perStyle'   => [],
+                'requeseted' => []
+            ]);
         }
 
+        // ================== BUILD KEYS ==================
+        $keys = [];
+        foreach ($data as $row) {
+            $keys[] = $row['mastermodel'] . '_' . $row['size'];
+        }
+        $keys = array_unique($keys);
+
+        // ================== BULK QUERY ==================
+        $prodRows = $this->produksiModel->getProdBulkByModelSize($keys);
+        $statusRows = $this->estspk->getStatusBulk($keys, $area);
+
+        // ================== MAP DATA ==================
+        $prodMap = [];
+        foreach ($prodRows as $p) {
+            $key = $p['mastermodel'] . '_' . $p['size'];
+            $prodMap[$key] = [
+                'prod' => (int)($p['prod'] ?? 0),
+                'bs'   => (int)($p['bs'] ?? 0),
+            ];
+        }
+
+        $statusMap = [];
+        foreach ($statusRows as $s) {
+            $key = $s['model'] . '_' . $s['style'];
+            $statusMap[$key] = $s;
+        }
+
+        // ================== FINAL DATA ==================
+        $perStyle   = [];
+        $requeseted = [];
+
+        foreach ($data as $id) {
+
+            $key = $id['mastermodel'] . '_' . $id['size'];
+
+            $dataProd   = $prodMap[$key]   ?? ['prod' => 0, 'bs' => 0];
+            $sudahMinta = $statusMap[$key] ?? null;
+
+            // ================== SUDAH REQUEST ==================
+            if ($sudahMinta) {
+
+                $status = $sudahMinta['status'] === 'sudah'
+                    ? 'Menunggu Acc'
+                    : $sudahMinta['status'];
+
+                $requeseted[] = [
+                    'model'      => $sudahMinta['model'],
+                    'style'      => $sudahMinta['style'],
+                    'area'       => $sudahMinta['area'],
+                    'qty'        => (int)$sudahMinta['qty'],
+                    'status'     => $status,
+                    'updated_at' => $sudahMinta['updated_at'],
+                ];
+
+                continue;
+            }
+
+            // ================== HITUNG ESTIMASI ==================
+            $ttlProd = $dataProd['prod'];
+            if ($ttlProd <= 0) continue;
+
+            $qty    = (int)$id['qty'];
+            $sisa   = (int)$id['sisa'];
+            $bs     = $dataProd['bs'];
+            $poplus = (int)$id['poplus'];
+
+            $percentage = round(($ttlProd / $qty) * 100);
+            $ganti      = $bs + $poplus;
+            $estimasi   = ($ganti / $ttlProd / 100) * $qty;
+
+            $perStyle[] = [
+                'model'       => $id['mastermodel'],
+                'inisial'    => $id['inisial'],
+                'size'       => $id['size'],
+                'sisa'       => $sisa,
+                'qty'        => $qty,
+                'ttlProd'    => $ttlProd,
+                'percentage' => $percentage,
+                'bs'         => $bs,
+                'poplus'     => $poplus,
+                'jarum'      => $id['machinetypeid'],
+                'estimasi'   => round($estimasi * 100, 1),
+                'status'     => 'belum',
+                'waktu'      => '-',
+            ];
+        }
 
 
         $data2 = [
@@ -2286,7 +2329,7 @@ class OrderController extends BaseController
             $spk['deffect'] =  $this->bsModel->getBsPph($idapsList)['bs_setting'] ?? '-';
         }
         // dd($estimasiSpk);
-        $aproved = $this->estspk->getHistorySpk();
+        // $aproved = $this->estspk->getHistorySpk();
         // dd($estimasiSpk);
         $data = [
             'role' => session()->get('role'),
@@ -2299,7 +2342,7 @@ class OrderController extends BaseController
             'active6' => '',
             'active7' => '',
             'data' => $estimasiSpk,
-            'history' => $aproved,
+            // 'history' => $aproved,
 
         ];
         return view(session()->get('role') . '/Order/pengajuanspk2', $data);
@@ -2337,7 +2380,6 @@ class OrderController extends BaseController
     public function mintaSpk2()
     {
         $rows = $this->request->getPost('data');
-
         if (!empty($rows)) {
             $allData = [];
 
@@ -2360,6 +2402,7 @@ class OrderController extends BaseController
                         'model'  => $row['model'],
                         'style'  => $row['size'],
                         'area'   => $row['area'],
+                        'keterangan'   => $row['keterangan'],
                         'qty'    => isset($row['estimasi']) ? (int)$row['estimasi'] : 0,
                         'status' => 'sudah'
                     ]);
@@ -2398,6 +2441,7 @@ class OrderController extends BaseController
                     'style' => $item['size'],
                     'area' => $item['area'],
                     'qty'   => $item['qty'],
+                    'keterangan'   => $item['keterangan'],
                     'status' => 'sudah'
                 ]);
             }
@@ -2851,5 +2895,41 @@ class OrderController extends BaseController
             'role' => $role
         ];
         return view($role . '/Order/sisaOrderAnomali', $data);
+    }
+    public function historySpk()
+    {
+        $request = service('request');
+
+        $draw   = (int) $request->getPost('draw');
+        $start  = (int) $request->getPost('start');
+        $length = (int) $request->getPost('length');
+        $search = $request->getPost('search')['value'] ?? '';
+
+        $orderIndex = $request->getPost('order')[0]['column'] ?? 0;
+        $orderDir   = $request->getPost('order')[0]['dir'] ?? 'desc';
+
+        // ⚠️ FIELD ASLI DATABASE (BUKAN SQL FUNCTION)
+        $columns = [
+            'created_at', // tanggal
+            'created_at', // jam
+            'model',
+            'style',
+            'area',
+            'qty',
+            'status'
+        ];
+
+        $orderColumn = $columns[$orderIndex] ?? 'created_at';
+
+        $data     = $this->estspk->getHistorySpk($start, $length, $search, $orderColumn, $orderDir);
+        $total    = $this->estspk->countHistorySpk();
+        $filtered = $this->estspk->countHistorySpkFiltered($search);
+
+        return $this->response->setJSON([
+            'draw'            => $draw,
+            'recordsTotal'    => $total,
+            'recordsFiltered' => $filtered,
+            'data'            => $data
+        ]);
     }
 }

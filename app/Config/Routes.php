@@ -436,6 +436,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('saveRepeat', 'OrderController::saveRepeat');
     $routes->get('flowProses', 'OrderController::flowProses');
     $routes->post('semuaOrder/importFlowproses', 'OrderController::importFlowproses');
+    $routes->post('historySpk', 'OrderController::historySpk');
 
     // mesin
     $routes->get('datamesin', 'MesinController::indexPlan');
