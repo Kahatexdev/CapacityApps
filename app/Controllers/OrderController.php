@@ -2905,6 +2905,12 @@ class OrderController extends BaseController
         $length = (int) $request->getPost('length');
         $search = $request->getPost('search')['value'] ?? '';
 
+        $filters = [
+            'no_model' => $request->getPost('no_model'),
+            'style'    => $request->getPost('style'),
+            'tgl'      => $request->getPost('tgl'),
+        ];
+
         $orderIndex = $request->getPost('order')[0]['column'] ?? 0;
         $orderDir   = $request->getPost('order')[0]['dir'] ?? 'desc';
 
@@ -2921,7 +2927,7 @@ class OrderController extends BaseController
 
         $orderColumn = $columns[$orderIndex] ?? 'created_at';
 
-        $data     = $this->estspk->getHistorySpk($start, $length, $search, $orderColumn, $orderDir);
+        $data     = $this->estspk->getHistorySpk($start, $length, $search, $orderColumn, $orderDir, $filters);
         $total    = $this->estspk->countHistorySpk();
         $filtered = $this->estspk->countHistorySpkFiltered($search);
 

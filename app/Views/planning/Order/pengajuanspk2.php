@@ -98,6 +98,46 @@
         <div class="row mt-3">
             <div class="card">
                 <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label text-xs mb-1">Tanggal Approve</label>
+                            <input type="date" id="filter_tgl" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label text-xs mb-1">No Model</label>
+                            <input type="text" id="filter_model" class="form-control" placeholder="No Model">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label text-xs mb-1">Style</label>
+                            <input type="text" id="filter_style" class="form-control" placeholder="Style">
+                        </div>
+
+                        <div class="col-md-3 d-flex flex-column">
+                            <label class="form-label text-xs mb-1" style="visibility:hidden;">
+                                &nbsp;
+                            </label>
+
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <button id="btnFilter" class="btn btn-primary w-100">
+                                        Filter
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button id="btnReset" class="btn btn-secondary w-100">
+                                        Reset
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button id="btnExcel" class="btn btn-success w-100">
+                                        Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table id="example1" class="display compact " style="width:100%">
                             <thead>
@@ -236,8 +276,38 @@
 
     });
     $(document).ready(function() {
+        // filter data saat button filter di klik
+        $('#btnFilter').on('click', function() {
+            table.ajax.reload();
+        });
 
-        $('#example1').DataTable({
+        // reset filter saat btn reset di klik
+        $('#btnReset').on('click', function() {
+
+            // Kosongkan semua filter
+            $('#filter_tgl').val('');
+            $('#filter_model').val('');
+            $('#filter_style').val('');
+
+            // Reload DataTable tanpa filter
+            table.ajax.reload();
+        });
+
+        // export excel
+        $('#btnExcel').on('click', function() {
+            let params = {
+                tgl: $('#filter_tgl').val(),
+                no_model: $('#filter_model').val(),
+                style: $('#filter_style').val()
+            };
+
+            let query = $.param(params);
+
+            // buka download excel
+            window.open("<?= base_url($role . '/exportHistorySpk') ?>?" + query, '_blank');
+        });
+
+        let table = $('#example1').DataTable({
             processing: true,
             serverSide: true,
             searching: true,
@@ -247,7 +317,12 @@
 
             ajax: {
                 url: "<?= base_url($role . '/historySpk') ?>",
-                type: "POST"
+                type: "POST",
+                data: function(d) {
+                    d.no_model = $('#filter_model').val();
+                    d.style = $('#filter_style').val();
+                    d.tgl = $('#filter_tgl').val();
+                }
             },
 
             // URUTAN KOLOM HARUS SAMA DENGAN <th>

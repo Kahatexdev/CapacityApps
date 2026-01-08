@@ -437,6 +437,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('flowProses', 'OrderController::flowProses');
     $routes->post('semuaOrder/importFlowproses', 'OrderController::importFlowproses');
     $routes->post('historySpk', 'OrderController::historySpk');
+    $routes->get('exportHistorySpk', 'ExcelController::exportHistorySpk');
 
     // mesin
     $routes->get('datamesin', 'MesinController::indexPlan');
@@ -1270,6 +1271,12 @@ $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
     $routes->get('pengaduan', 'PengaduanController::index');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
+
+    // oee
+    $routes->get('oee', 'OEEController::index');
+
+    // datamontir
+    $routes->get('dataMontir', 'IeController::dataMontir');
 
     // oee
     $routes->get('oee', 'OEEController::index');
