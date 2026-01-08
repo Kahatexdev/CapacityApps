@@ -185,4 +185,28 @@ class PerbaikanAreaModel extends Model
         }
         return $index;
     }
+    public function totalPerbulan($filters)
+    {
+        $builder = $this->select('SUM(qty) as qty');
+
+        if (!empty($filters['bulan'])) {
+            $builder->where('MONTH(tgl_perbaikan)', $filters['bulan']);
+        }
+
+        if (!empty($filters['tahun'])) {
+            $builder->where('YEAR(tgl_perbaikan)', $filters['tahun']);
+        }
+
+        if (!empty($filters['area'])) {
+            $builder->where('area', $filters['area']);
+        }
+
+        // Ambil hasil query, pastikan ambil baris pertama
+        $result = $builder->findAll();
+
+        // Akses nilai 'prod' dari baris pertama
+        $qty = isset($result[0]['qty']) ? $result[0]['qty'] : 0; // Default ke 0 jika null
+
+        return $qty;
+    }
 }

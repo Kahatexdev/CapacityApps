@@ -19,6 +19,7 @@ $routes->get('chart/getBsMesin', 'DeffectController::getBsMesin');
 $routes->get('chart/dashboardData', 'GodController::dashboardData');
 $routes->get('chart/getDailyProd', 'GodController::getDailyProd');
 $routes->get('oee/fetchData', 'OEEController::fetchData');
+$routes->get('oee/fetchSummary', 'OEEController::fetchSummary');
 $routes->get('exportProd', 'ExcelController::exportProd');
 
 
@@ -437,6 +438,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('flowProses', 'OrderController::flowProses');
     $routes->post('semuaOrder/importFlowproses', 'OrderController::importFlowproses');
     $routes->post('historySpk', 'OrderController::historySpk');
+    $routes->get('exportHistorySpk', 'ExcelController::exportHistorySpk');
 
     // mesin
     $routes->get('datamesin', 'MesinController::indexPlan');
@@ -1273,6 +1275,7 @@ $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
 
     // oee
     $routes->get('oee', 'OEEController::index');
+
     
     // datamontir
     $routes->get('dataMontir', 'IeController::dataMontir');

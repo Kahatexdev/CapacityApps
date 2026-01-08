@@ -96,8 +96,7 @@
 
                     <div class="row align-items-center mb-3">
                         <div class="col-md-6">
-                            <p class="text-sm mb-1 fw-bold text-uppercase">Capacity System</p>
-                            <h5 class="fw-bold mb-0">Overall Equipment Effectiveness</h5>
+                            <h6 class="fw-bold mb-0">Overall Equipment Effectiveness</h6>
                         </div>
 
                         <div class="col-md-6 d-flex justify-content-md-end gap-2 mt-3 mt-md-0">
@@ -107,30 +106,35 @@
                             </a>
                         </div>
                     </div>
+                    <div class="summary">
+                        <h5>Summary KPI <strong class="area"> - </strong> <strong class="monthName"> - </strong> </h5>
+                    </div>
 
                     <div class="row align-items-center border-top pt-3">
                         <div class="col-md-6">
-                            <span class="fw-bold">Area: <strong class="area"> - </strong> </span><br>
-                            <span class="fw-bold">Average OEE <strong class="monthName"> - </strong>:</span>
+                            <span class="fw-bold">Average OEE :</span>
                             <span class="fw-bold text-primary ms-1" id="averageMonth">-</span><br>
-                            <span class="fw-bold">Average Quality <strong class="monthName"> - </strong></span>
+                            <span class="fw-bold">Average Quality : </strong></span>
                             <span class="fw-bold text-primary ms-1" id="averageQuality">-</span><br>
-                            <span class="fw-bold">Average Performance <strong class="monthName"> - </strong></span>
+                            <span class="fw-bold">Average Performance : </strong></span>
                             <span class="fw-bold text-primary ms-1" id="averagePerformance">-</span> <br>
-                            <span class="fw-bold">Average Availability <strong class="monthName"> - </strong></span>
+                            <span class="fw-bold">Average Availability : </strong></span>
                             <span class="fw-bold text-primary ms-1" id="averageAvailability">-</span>
                         </div>
-
-                        <div class="col-md-6 d-flex justify-content-md-end gap-2 mt-2 mt-md-0">
-                            <select id="filterArea" class="form-control w-auto">
-                                <?php foreach ($area as $ar): ?>
-                                    <option value="<?= $ar ?>"><?= $ar ?></option>
-                                <?php endforeach; ?>
-                            </select>
-
-                            <input type="date" id="filterTanggal" value="<?= $latest ?>" class="form-control w-auto">
-                            <button id="btnFilter" class="btn btn-info">🔍</button>
+                        <div class="col-md-6">
+                            <span class="fw-bold">Total Produksi :</span>
+                            <span class="fw-bold text-primary ms-1" id="produksi">-</span> dz<br>
+                            <span class="fw-bold">In Perbaikan : </span>
+                            <span class="fw-bold text-primary ms-1" id="perbaikan">-</span> dz ( <span id="perbaikanPersen"></span>)<br>
+                            <span class="fw-bold">Out Perbaikan Good :</span>
+                            <span class="fw-bold text-primary ms-1" id="goodPb">-</span> dz ( <span id="goodPbPersen"></span>)<br>
+                            <span class="fw-bold">Deffect Perbaikan :</span>
+                            <span class="fw-bold text-primary ms-1" id="bsPb">-</span> dz ( <span id="bsPbPersen"></span>)<br>
+                            <span class="fw-bold">Total Stocklot :</span>
+                            <span class="fw-bold text-primary ms-1" id="stocklot">-</span> dz ( <span id="stocklotPersen"></span>)<br>
                         </div>
+
+
                     </div>
 
                 </div>
@@ -144,11 +148,28 @@
     <div class="card">
 
         <div class="card-header">
-            <h5>
-                OEE
-                <strong id="tanggal">area</strong>
-            </h5>
+            <div class=" row align-items-center border-top pt-3">
+
+                <div class="col-md-6 ">
+                    <h5>
+                        OEE
+                        <strong id="tanggal">area</strong>
+                    </h5>
+                </div>
+
+                <div class="col-md-6 d-flex justify-content-md-end gap-2 mt-2 mt-md-0">
+                    <select id="filterArea" class="form-control w-auto">
+                        <?php foreach ($area as $ar): ?>
+                            <option value="<?= $ar ?>"><?= $ar ?></option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <input type="date" id="filterTanggal" value="<?= $latest ?>" class="form-control w-auto">
+                    <button id="btnFilter" class="btn btn-info">🔍</button>
+                </div>
+            </div>
         </div>
+
     </div>
 
 
@@ -245,6 +266,10 @@
         return Number(v).toFixed(2) + ' %';
     }
 
+    function formatRound(v) {
+        return Number(v).toFixed(2);
+    }
+
     function applyKpi(id, value) {
         const card = $('#' + id).closest('.card');
         card.removeClass('kpi-good kpi-mid kpi-bad')
@@ -260,6 +285,32 @@
             },
             function(response) {
                 dashboard(response, area, tanggal);
+            }
+        );
+    }
+
+    function fetchSummary(tanggal, area) {
+        $.getJSON(
+            "<?= base_url('oee/fetchSummary') ?>", {
+                tanggal,
+                area
+            },
+            function(response) {
+                let prod = response.produksi
+                let pb = response.perbaikan
+                let stc = response.stocklot
+                let pbStc = response.stcPb
+
+                $('#produksi').text(formatRound(prod / 24));
+                $('#perbaikan').text(formatRound(pb / 24));
+                $('#perbaikanPersen').text(formatPercent(pb / prod * 100));
+                $('#bsPb').text(formatRound(pbStc));
+                $('#bsPbPersen').text(formatPercent(pbStc / pb * 100));
+                $('#goodPb').text(formatRound(pb - pbStc));
+                $('#goodPbPersen').text(formatPercent((pb - pbStc) / pb * 100));
+                $('#stocklot').text(formatRound(stc));
+                $('#stocklotPersen').text(formatPercent(stc / prod * 100));
+
             }
         );
     }
@@ -317,6 +368,7 @@
 
     function handleFilterChange() {
         fetchOee($('#filterTanggal').val(), $('#filterArea').val());
+        fetchSummary($('#filterTanggal').val(), $('#filterArea').val());
     }
 
     handleFilterChange();

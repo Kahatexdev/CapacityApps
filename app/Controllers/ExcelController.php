@@ -4784,7 +4784,7 @@ class ExcelController extends BaseController
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
 
-        // Terapkan style ke seluruh area header (baris 8–10)
+        // Terapkan style ke seluruh area header (baris 8ï¿½10)
         $sheet->getStyle('A8:AD10')->applyFromArray($styleHeader);
         // Border kiri double untuk kolom A pada header
         $sheet->getStyle('A8:A10')->applyFromArray([
@@ -4886,8 +4886,8 @@ class ExcelController extends BaseController
                     ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
                 $sheet->getRowDimension($rowNum)->setRowHeight(20);
-                // ?? Tambahin cek nilai kolom L–S di baris TOTAL
-                $columns = range('L', 'Z'); // L–Z
+                // ?? Tambahin cek nilai kolom Lï¿½S di baris TOTAL
+                $columns = range('L', 'Z'); // Lï¿½Z
                 $columns = array_merge($columns, ['AA', 'AB', 'AC']); // tambah kolom > Z
 
                 foreach ($columns as $col) {
@@ -4953,7 +4953,7 @@ class ExcelController extends BaseController
             ], null, 'A' . $rowNum);
 
             // ?? Loop cek kolom L sampai S (ASCII 76 = L, 83 = S)
-            $columns = range('L', 'Z'); // L–Z
+            $columns = range('L', 'Z'); // Lï¿½Z
             $columns = array_merge($columns, ['AA', 'AB', 'AC']); // tambah kolom > Z
 
             foreach ($columns as $col) {
@@ -5057,8 +5057,8 @@ class ExcelController extends BaseController
                 ],
             ]);
             $sheet->getRowDimension($rowNum)->setRowHeight(20);
-            // ?? Tambahin cek nilai kolom L–S di baris TOTAL
-            $columns = range('L', 'Z'); // L–Z
+            // ?? Tambahin cek nilai kolom Lï¿½S di baris TOTAL
+            $columns = range('L', 'Z'); // Lï¿½Z
             $columns = array_merge($columns, ['AA', 'AB', 'AC']); // tambah kolom > Z
 
             foreach ($columns as $col) {
@@ -7281,7 +7281,7 @@ class ExcelController extends BaseController
     //         ->setHorizontal(Alignment::HORIZONTAL_CENTER)
     //         ->setVertical(Alignment::VERTICAL_CENTER);
 
-    //     // Terapkan style ke seluruh area header (baris 8–10)
+    //     // Terapkan style ke seluruh area header (baris 8ï¿½10)
     //     $sheet->getStyle('A8:AD10')->applyFromArray($styleHeader);
     //     // Border kiri double untuk kolom A pada header
     //     $sheet->getStyle('A8:A10')->applyFromArray([
@@ -8010,7 +8010,7 @@ class ExcelController extends BaseController
                     $rowNum += 2; // jarak sedikit
                     $this->renderHeaderFormRetur($sheet, $area, $tglBuat, $delivery, $dataReturGrouped, $$styleHeader);
 
-                    $rowNum = 11; // header form kamu mengisi baris 1–10
+                    $rowNum = 11; // header form kamu mengisi baris 1ï¿½10
                     $currentPageRowCount = 0;
                 }
 
@@ -8298,7 +8298,7 @@ class ExcelController extends BaseController
             $sheet->getRowDimension($r)->setRowHeight(20);
         }
 
-        // Terapkan border luar — sesuai margin (atas: 1, bawah: lastRow)
+        // Terapkan border luar ï¿½ sesuai margin (atas: 1, bawah: lastRow)
 
         $sheet->getStyle("A11:AD{$lastTT}")->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
@@ -8649,7 +8649,7 @@ class ExcelController extends BaseController
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
 
-        // Terapkan style ke seluruh area header (baris 8–10)
+        // Terapkan style ke seluruh area header (baris 8ï¿½10)
         $sheet->getStyle('A8:AD10')->applyFromArray($styleHeader);
         // Border kiri double untuk kolom A pada header
         $sheet->getStyle('A8:A10')->applyFromArray([
@@ -9113,7 +9113,7 @@ class ExcelController extends BaseController
                     ],
                 ]);
 
-            // Auto–size kolom
+            // Autoï¿½size kolom
             foreach (range('A', 'X') as $c) {
                 $sheet->getColumnDimension($c)->setAutoSize(true);
             }
@@ -10583,7 +10583,7 @@ class ExcelController extends BaseController
             if (empty($bulan) || !preg_match('/^\d{4}\-\d{2}$/', $bulan)) {
                 return $this->response
                     ->setStatusCode(400)
-                    ->setJSON(['error' => 'Parameter “bulan” harus dalam format YYYY-MM']);
+                    ->setJSON(['error' => 'Parameter ï¿½bulanï¿½ harus dalam format YYYY-MM']);
             }
 
             $timestamp     = strtotime($bulan . '-01');
@@ -15202,7 +15202,7 @@ class ExcelController extends BaseController
                 $plotArea
             );
 
-            // Posisi chart di kiri (A–E)
+            // Posisi chart di kiri (Aï¿½E)
             $chart->setTopLeftPosition('A' . ($barStart + 1));
             $chart->setBottomRightPosition('E' . ($barStart + 25));
 
@@ -16031,6 +16031,110 @@ class ExcelController extends BaseController
         header('Cache-Control: max-age=0');
 
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function exportHistorySpk()
+    {
+        $request = service('request');
+
+        $filters = [
+            'tgl'      => $request->getGet('tgl'),
+            'no_model' => $request->getGet('no_model'),
+            'style'    => $request->getGet('style'),
+        ];
+
+        $data = $this->estspk->getHistorySpkExport($filters);
+
+        // start excel
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Title
+        $sheet->setCellValue('A1', "History SPK");
+        $sheet->mergeCells('A1:H1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'size' => 14,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+        ]);
+
+        $headers = [
+            'A3' => 'Tanggal Approve',
+            'B3' => 'Jam',
+            'C3' => 'No Model',
+            'D3' => 'Style',
+            'E3' => 'Area',
+            'F3' => 'Qty',
+            'G3' => 'Status',
+            'H3' => 'Keterangan',
+        ];
+
+        foreach ($headers as $cell => $text) {
+            $sheet->setCellValue($cell, $text);
+        }
+        // Style header
+        $sheet->getStyle('A3:H3')->applyFromArray([
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+        ]);
+
+        $row = 4;
+
+        foreach ($data as $item) {
+            $sheet->setCellValue('A' . $row, $item['tgl_buat']);
+            $sheet->setCellValue('B' . $row, $item['jam']);
+            $sheet->setCellValue('C' . $row, $item['model']);
+            $sheet->setCellValue('D' . $row, $item['style']);
+            $sheet->setCellValue('E' . $row, $item['area']);
+            $sheet->setCellValue('F' . $row, $item['qty']);
+            $sheet->setCellValue('G' . $row, $item['status']);
+            $sheet->setCellValue('H' . $row, $item['keterangan']);
+            $row++;
+        }
+
+        // Border body
+        $sheet->getStyle('A3:H' . ($row - 1))->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+        ]);
+
+        // Auto width kolom
+        foreach (range('A', 'H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = 'History_SPK_' . date('Ymd_His') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
     }
