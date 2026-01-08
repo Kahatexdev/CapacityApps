@@ -298,4 +298,34 @@ class BsModel extends Model
 
         return $this->findAll();
     }
+    public function bsPbBulan(array $filters)
+    {
+        $builder = $this->select('SUM(data_bs.qty) AS stcPb');
+
+        // label 3000–3999 dan 8000–8999
+        $builder->groupStart()
+            ->groupStart()
+            ->where('no_label >=', 3000)
+            ->where('no_label <=', 3999)
+            ->groupEnd()
+            ->orGroupStart()
+            ->where('no_label >=', 8000)
+            ->where('no_label <=', 8999)
+            ->groupEnd()
+            ->groupEnd();
+
+        if (!empty($filters['bulan'])) {
+            $builder->where('MONTH(tgl_instocklot)', $filters['bulan']);
+        }
+
+        if (!empty($filters['tahun'])) {
+            $builder->where('YEAR(tgl_instocklot)', $filters['tahun']);
+        }
+
+        if (!empty($filters['area'])) {
+            $builder->where('area', $filters['area']);
+        }
+
+        return $builder->first();
+    }
 }

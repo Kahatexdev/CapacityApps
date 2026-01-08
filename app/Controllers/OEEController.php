@@ -8,6 +8,7 @@ use Throwable;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use CodeIgniter\I18n\Time;
 
 class OEEController extends BaseController
 {
@@ -240,6 +241,52 @@ class OEEController extends BaseController
             'summary' => $summary,
             'detail' => $detail,
             'average' => $averageMonth
+        ]);
+    }
+    public function fetchSummary()
+    {
+        $tanggal = $this->request->getGet('tanggal');
+        $area    = $this->request->getGet('area');
+
+
+        if (!$tanggal || !$area) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => 'Tanggal dan Area wajib diisi'
+            ]);
+        }
+        try {
+            $time = Time::parse($tanggal);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status'  => false,
+                'message' => 'Format tanggal tidak valid'
+            ]);
+        }
+        $filters = [
+            'bulan' => $time->format('m'),
+            'tahun' => $time->format('Y'),
+            'area'  => $area,
+        ];
+        // ================= SUMMARY =================
+        $produksi = $this->produksiModel->totalProdBulan($filters);
+        $perbaikan = $this->perbaikanAreaModel->totalPerbulan($filters);
+        $stocklot = $this->bsModel->bsMonthly($filters)['bs'] ?? 0;
+        $stcPb = $this->bsModel->bsPbBulan($filters)['stcPb'] ?? 0;
+
+        // ================= DETAIL TABLE =================
+        $detail = $this->downtimeModel->getOeeDetail($tanggal, $area);
+
+        return $this->response->setJSON([
+            'status' => true,
+            'filter' => [
+                'tanggal' => $tanggal,
+                'area' => $area
+            ],
+            'produksi' => $produksi,
+            'perbaikan' => $perbaikan,
+            'stocklot' => $stocklot,
+            'stcPb' => $stcPb,
         ]);
     }
 }
