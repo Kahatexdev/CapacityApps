@@ -1276,6 +1276,7 @@ $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
     // oee
     $routes->get('oee', 'OEEController::index');
 
+    
     // datamontir
     $routes->get('dataMontir', 'IeController::dataMontir');
 
