@@ -86,7 +86,7 @@ class ReturController extends BaseController
             'kategori' => $kategoriRetur,
             'list' => $listRetur
         ];
-        return view(session()->get('role') . '/retur', $data);
+        return view(session()->get('role') . '/retur', $viewData);
     }
 
     public function dataRetur($area)
