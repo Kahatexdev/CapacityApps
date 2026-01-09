@@ -334,9 +334,110 @@ class DeffectController extends BaseController
             'area' => $area,
             'buyer' => $buyer,
         ];
-        $getData = $this->perbaikanModel->getDataPerbaikanFilter($theData);
+        $databs = $this->perbaikanModel->getDataPerbaikanFilter($theData);
         $total = $this->perbaikanModel->totalPerbaikan($theData);
         $chartData = $this->perbaikanModel->chartData($theData);
+        $chartTop10 = array_slice($chartData, 0, 10);
+
+        // filter bulan sumamry global
+        $currentMonth = (int) date('n');
+        $currentYear  = (int) date('Y');
+
+        $namaBulan = [
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember'
+        ];
+
+        $bulanList = [];
+        for ($month = 1; $month <= 12; $month++) {
+            $bulanList[] = [
+                'value' => sprintf('%04d-%02d', $currentYear, $month), // contoh: 2025-01
+                'label' => $namaBulan[$month] . ' ' . $currentYear
+            ];
+        }
+
+        $getData = $this->perbaikanModel->getDataSummaryPerbaikan($theData);
+        $totalSum = [
+            'prod'  => 0,
+            'pb'    => 0,
+            'goodPb' => 0,
+            'stc'   => 0,
+            'stcPb' => 0,
+        ];
+
+        foreach ($getData as $row) {
+            $prod  = (float) ($row['prod']  ?? 0);
+            $pb    = (float) ($row['pb']    ?? 0);
+            $stc   = (float) ($row['stc']   ?? 0);
+            $stcPb = (float) ($row['stcPb'] ?? 0);
+
+            $totalSum['prod']   += $prod;
+            $totalSum['pb']     += $pb;
+            $totalSum['stc']    += $stc;
+            $totalSum['stcPb']  += $stcPb;
+            $totalSum['goodPb'] += ($pb - $stcPb);
+        }
+
+        $data = [
+            'role' => session()->get('role'),
+            'username' => session()->get('username'),
+            'title' => ' Data Perbaikan',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'kode' => $master,
+            'databs' => $databs,
+            'getData' => $getData,
+            'awal' => $awal,
+            'akhir' => $akhir,
+            'pdk' => $pdk,
+            'area' => $area,
+            'totalbs' => $total,
+            'chart' => $chartData,
+            'topTen' => $chartTop10,
+            'dataBuyer' => $dataBuyer,
+            'filter' => $theData,
+            'filterBulan' => $bulanList,
+            'total' => $totalSum,
+        ];
+        // dd($data);
+
+        return view(session()->get('role') . '/Perbaikan/tabelperbaikan', $data);
+    }
+    public function detailViewPerbaikan()
+    {
+        $master = $this->deffectModel->findAll();
+        $dataBuyer = $this->orderModel->getBuyer();
+
+        $awal = $this->request->getGet('awal') ?? '';
+        $akhir = $this->request->getGet('akhir') ?? '';
+        $pdk = $this->request->getGet('pdk') ?? '';
+        $area = $this->request->getGet('area') ?? '';
+        $buyer = $this->request->getGet('buyer') ?? '';
+        // dd($buyer);
+        $theData = [
+            'awal' => $awal,
+            'akhir' => $akhir,
+            'pdk' => $pdk,
+            'area' => $area,
+            'buyer' => $buyer,
+        ];
+        $databs = $this->perbaikanModel->getDataPerbaikanFilter($theData);
+        $total = $this->perbaikanModel->totalPerbaikan($theData);
 
         // filter bulan sumamry global
         $currentMonth = (int) date('n');
@@ -368,7 +469,7 @@ class DeffectController extends BaseController
         $data = [
             'role' => session()->get('role'),
             'username' => session()->get('username'),
-            'title' => ' Data Perbaikan',
+            'title' => ' Data Detail Perbaikan',
             'active1' => '',
             'active2' => '',
             'active3' => '',
@@ -377,19 +478,17 @@ class DeffectController extends BaseController
             'active6' => '',
             'active7' => '',
             'kode' => $master,
-            'databs' => $getData,
+            'databs' => $databs,
             'awal' => $awal,
             'akhir' => $akhir,
             'pdk' => $pdk,
             'area' => $area,
-            'totalbs' => $total,
-            'chart' => $chartData,
             'dataBuyer' => $dataBuyer,
             'filter' => $theData,
             'filterBulan' => $bulanList,
         ];
 
-        return view(session()->get('role') . '/Perbaikan/tabelperbaikan', $data);
+        return view(session()->get('role') . '/Perbaikan/tabelperbaikanDetail', $data);
     }
     public function summaryGlobalPbArea()
     {
