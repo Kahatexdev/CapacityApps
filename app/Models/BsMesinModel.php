@@ -86,6 +86,14 @@ class BsMesinModel extends Model
         $bulanNumber = $bulanDateTime->format('m'); // 12
         $builder = $this->select('bs_mesin.nama_karyawan, sum(bs_mesin.qty_pcs) as qty_pcs, sum(bs_mesin.qty_gram) as qty_gram , bs_mesin.no_model, bs_mesin.size')
             ->join('data_model', 'data_model.no_model=bs_mesin.no_model', 'left')
+            ->join(
+                '(SELECT mastermodel, size 
+                    FROM apsperstyle 
+                    WHERE qty > 0 
+                    GROUP BY mastermodel, size) aps',
+                'aps.mastermodel = bs_mesin.no_model AND aps.size = bs_mesin.size',
+                'inner'
+            )
             ->where('MONTH(bs_mesin.tanggal_produksi)', $bulanNumber) // Filter bulan
             ->where('YEAR(bs_mesin.tanggal_produksi)', $tahun) // Filter bulan
             ->where('bs_mesin.area', $area);

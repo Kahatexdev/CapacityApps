@@ -154,28 +154,28 @@
                 <table id="dataTable" class="display text-center text-uppercase" style="width:100%">
                     <thead>
                         <tr>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Foll Up</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Model</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Order</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Buyer</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Delivery Awal</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Delivery Akhir</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Order Type</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Item Type</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Kode Warna</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Warna</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">KG Pesan</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tanggal Datang</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Kgs Datang</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cones Datang</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">LOT Datang</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">No Surat Jalan</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">LMD</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">GW</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Harga</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nama Cluster</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Keterangan</th>
+                            <th class="text-center">No</th>
+                            <th class="text-center">Foll Up</th>
+                            <th class="text-center">No Model</th>
+                            <th class="text-center">No Order</th>
+                            <th class="text-center">Buyer</th>
+                            <th class="text-center">Delivery Awal</th>
+                            <th class="text-center">Delivery Akhir</th>
+                            <th class="text-center">Order Type</th>
+                            <th class="text-center">Item Type</th>
+                            <th class="text-center">Kode Warna</th>
+                            <th class="text-center">Warna</th>
+                            <th class="text-center">KG Pesan</th>
+                            <th class="text-center">Tanggal Datang</th>
+                            <th class="text-center">Kgs Datang</th>
+                            <th class="text-center">Cones Datang</th>
+                            <th class="text-center">LOT Datang</th>
+                            <th class="text-center">No Surat Jalan</th>
+                            <th class="text-center">LMD</th>
+                            <th class="text-center">GW</th>
+                            <th class="text-center">Harga</th>
+                            <th class="text-center">Nama Cluster</th>
+                            <th class="text-center">Keterangan</th>
                             <!-- <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Update</th> -->
                         </tr>
                     </thead>

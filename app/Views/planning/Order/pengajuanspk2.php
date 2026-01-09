@@ -69,6 +69,7 @@
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">BS Stocklot</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">(+) Packing</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty Minta</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Keterangan</th>
 
                                 </tr>
                             </thead>
@@ -85,6 +86,7 @@
                                         <td class="text-center"><?= $row['deffect'] ?> pcs</td>
                                         <td class="text-center"><?= $row['plus_packing'] ?> pcs</td>
                                         <td class="text-center"><?= $row['qty'] ?> pcs</td>
+                                        <td class="text-center"><?= $row['keterangan'] ?> </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -96,6 +98,46 @@
         <div class="row mt-3">
             <div class="card">
                 <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label text-xs mb-1">Tanggal Approve</label>
+                            <input type="date" id="filter_tgl" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label text-xs mb-1">No Model</label>
+                            <input type="text" id="filter_model" class="form-control" placeholder="No Model">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label text-xs mb-1">Style</label>
+                            <input type="text" id="filter_style" class="form-control" placeholder="Style">
+                        </div>
+
+                        <div class="col-md-3 d-flex flex-column">
+                            <label class="form-label text-xs mb-1" style="visibility:hidden;">
+                                &nbsp;
+                            </label>
+
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <button id="btnFilter" class="btn btn-primary w-100">
+                                        Filter
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button id="btnReset" class="btn btn-secondary w-100">
+                                        Reset
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button id="btnExcel" class="btn btn-success w-100">
+                                        Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table id="example1" class="display compact " style="width:100%">
                             <thead>
@@ -106,23 +148,12 @@
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Style</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Area</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Qty</th>
+                                    <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Keterangan</th>
                                     <th class="text-uppercase text-dark text-xxs font-weight-bolder opacity-7 ps-2 text-center">Status</th>
 
                                 </tr>
                             </thead>
-                            <tbody>
-                                <?php foreach ($history as $row1) : ?>
-                                    <tr>
-                                        <td class="text-center"><?= $row1['tgl_buat'] ?></td>
-                                        <td class="text-center"><?= $row1['jam'] ?></td>
-                                        <td class="text-center"><?= $row1['model'] ?></td>
-                                        <td class="text-center"><?= $row1['style'] ?></td>
-                                        <td class="text-center"><?= $row1['area'] ?></td>
-                                        <td class="text-center"><?= $row1['qty'] ?> pcs</td>
-                                        <td class="text-center"><?= $row1['status'] ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
+
                         </table>
                     </div>
                 </div>
@@ -159,17 +190,14 @@
 <script src="<?= base_url('assets/js/plugins/chartjs.min.js') ?>"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        // Inisialisasi DataTable dengan opsi yang diinginkan
+
         var table = $('#example').DataTable({
             "order": [
-                [0, 'desc'] // Urutkan kolom pertama secara descending
-            ]
+                [0, 'desc']
+            ],
+            "length": 50,
         });
-        var table1 = $('#example1').DataTable({
-            "order": [
-                [0, 'desc'] // Urutkan kolom pertama secara descending
-            ]
-        });
+
 
         // Saat klik "select all", pilih semua checkbox pada baris yang tampil (mengikuti order & filter)
         $('#select-all').on('click', function() {
@@ -244,6 +272,113 @@
             // Tambahkan form ke body dan submit
             $('body').append(form);
             form.submit();
+        });
+
+    });
+    $(document).ready(function() {
+        // filter data saat button filter di klik
+        $('#btnFilter').on('click', function() {
+            table.ajax.reload();
+        });
+
+        // reset filter saat btn reset di klik
+        $('#btnReset').on('click', function() {
+
+            // Kosongkan semua filter
+            $('#filter_tgl').val('');
+            $('#filter_model').val('');
+            $('#filter_style').val('');
+
+            // Reload DataTable tanpa filter
+            table.ajax.reload();
+        });
+
+        // export excel
+        $('#btnExcel').on('click', function() {
+            let params = {
+                tgl: $('#filter_tgl').val(),
+                no_model: $('#filter_model').val(),
+                style: $('#filter_style').val()
+            };
+
+            let query = $.param(params);
+
+            // buka download excel
+            window.open("<?= base_url($role . '/exportHistorySpk') ?>?" + query, '_blank');
+        });
+
+        let table = $('#example1').DataTable({
+            processing: true,
+            serverSide: true,
+            searching: true,
+            ordering: true,
+            lengthChange: true,
+            pageLength: 50,
+
+            ajax: {
+                url: "<?= base_url($role . '/historySpk') ?>",
+                type: "POST",
+                data: function(d) {
+                    d.no_model = $('#filter_model').val();
+                    d.style = $('#filter_style').val();
+                    d.tgl = $('#filter_tgl').val();
+                }
+            },
+
+            // URUTAN KOLOM HARUS SAMA DENGAN <th>
+            columns: [{
+                    data: 'tgl_buat',
+                    className: 'text-center'
+                },
+                {
+                    data: 'jam',
+                    className: 'text-center'
+                },
+                {
+                    data: 'model',
+                    className: 'text-center'
+                },
+                {
+                    data: 'style',
+                    className: 'text-center'
+                },
+                {
+                    data: 'area',
+                    className: 'text-center'
+                },
+
+                {
+                    data: 'qty',
+                    className: 'text-center',
+                    render: function(data, type, row) {
+                        return data + ' pcs';
+                    }
+                },
+                {
+                    data: 'keterangan',
+                    className: 'text-center'
+                },
+                {
+                    data: 'status',
+                    className: 'text-center',
+                    render: function(data) {
+                        // optional styling
+                        if (data === 'Approved') {
+                            return '<span class="badge bg-success">' + data + '</span>';
+                        }
+                        return '<span class="badge bg-secondary">' + data + '</span>';
+                    }
+                }
+            ],
+
+            order: [
+                [0, 'desc']
+            ], // default order by tanggal
+
+            // BIAR GA ERROR DI CONSOLE KALO DATA KOSONG
+            language: {
+                emptyTable: "Data tidak tersedia"
+            }
         });
 
     });

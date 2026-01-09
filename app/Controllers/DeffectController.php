@@ -254,45 +254,74 @@ class DeffectController extends BaseController
 
     public function resetbsarea()
     {
-        $area = $this->request->getPost('area');
-        $awal = $this->request->getPost('awal');
+        $area  = $this->request->getPost('area') ?? null;
+        $awal  = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
 
-        $idaps = $this->bsModel->getDataForReset($area, $awal, $akhir);
-        if (!empty($idaps)) {
-            // Memulai transaksi
-            $this->db->transBegin();
-
-            $failedIds = []; // Array untuk menyimpan ID yang gagal
-
-            foreach ($idaps as $data) {
-                $qtyBs = intval($data['qty']);
-                $idbs = $data['idbs'];
-                $id = $data['idapsperstyle'];
-                $dataOrder = $this->ApsPerstyleModel->getSisaOrder($id);
-                $newOrder = $dataOrder - $qtyBs;
-
-                $updateOrder = $this->ApsPerstyleModel->update($id, ['sisa' => $newOrder]);
-                $this->bsModel->delete($idbs);
-            }
-
-            if ($this->db->transStatus() === FALSE || !empty($failedIds)) {
-                // Rollback jika ada yang gagal
-                $this->db->transRollback();
-
-                // Menyusun pesan kesalahan
-                $errorMsg = 'Gagal melakukan reset pada ID: ' . implode(', ', $failedIds);
-                return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('error', $errorMsg);
-            } else {
-                // Commit transaksi jika semua sukses
-                $this->db->transCommit();
-                return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('success', 'Data Berhasil di-reset');
-            }
-        } else {
-            // Jika $idaps kosong
-            return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('error', 'Tidak ada data yang ditemukan untuk di-reset.');
+        $rows = $this->bsModel->getDataForReset($awal, $akhir, $area);
+        if (empty($rows)) {
+            return redirect()
+                ->to(base_url(session()->get('role') . '/datadeffect'))
+                ->with('error', 'Tidak ada data yang ditemukan untuk di-reset.');
         }
+
+        $db = $this->db;
+
+        // ===============================
+        // CONTAINER
+        // ===============================
+        $apsReduceMap = []; // idaps => totalQtyBS
+        $bsIds        = []; // idbs list
+
+        foreach ($rows as $row) {
+            $idAps = (int) $row['idapsperstyle'];
+            $qty   = (int) $row['qty'];
+
+            $apsReduceMap[$idAps] = ($apsReduceMap[$idAps] ?? 0) + $qty;
+            $bsIds[] = (int) $row['idbs'];
+        }
+
+        if (empty($apsReduceMap) || empty($bsIds)) {
+            return redirect()
+                ->to(base_url(session()->get('role') . '/datadeffect'))
+                ->with('error', 'Data tidak valid untuk di-reset.');
+        }
+
+        $db->transStart();
+
+        /**
+         * UPDATE APS (per ID, tapi sudah teragregasi)
+         */
+        foreach ($apsReduceMap as $idAps => $totalQty) {
+            $this->ApsPerstyleModel
+                ->set('sisa', "sisa - {$totalQty}", false) // atomic
+                ->where('idapsperstyle', $idAps)
+                ->update();
+        }
+
+        /**
+         * DELETE BS (BATCH)
+         */
+        $this->bsModel
+            ->whereIn('idbs', $bsIds)
+            ->delete();
+
+        $db->transComplete();
+
+        // ===============================
+        // TRANSACTION CHECK
+        // ===============================
+        if ($db->transStatus() === false) {
+            return redirect()
+                ->to(base_url(session()->get('role') . '/datadeffect'))
+                ->with('error', 'Gagal melakukan reset data BS.');
+        }
+
+        return redirect()
+            ->to(base_url(session()->get('role') . '/datadeffect'))
+            ->with('success', 'Data BS berhasil di-reset.');
     }
+
     public function getBsMesin()
     {
         $bulan = $this->request->getGet('bulan');

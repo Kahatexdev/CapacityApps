@@ -44,9 +44,9 @@
                             <label for="tgl_po">Tgl Po Tambahan</label>
                             <input type="date" class="form-control" id="tgl_po" value="" required>
                             <button id="searchFilter" class="btn btn-info ms-2"><i class="fas fa-filter"></i>Filter</button>
-                            <button class="btn btn-info ms-2">
-                                <a href="<?= base_url($role . '/form-potambahan/' . $area) ?>" class="fa fa-list text-white" style="text-decoration: none;"> List</a>
-                            </button>
+                            <!-- <button class="btn btn-info ms-2"> -->
+                            <a href="<?= base_url($role . '/form-potambahan/' . $area) ?>" class="btn btn-info ms-2" style="text-decoration: none;"> <i class="fa fa-list text-white"></i> List</a>
+                            <!-- </button> -->
                         </div>
                     </div>
                 </div>
