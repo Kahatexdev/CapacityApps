@@ -15,7 +15,7 @@ class BsModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['idapsperstyle', 'no_label', 'area', 'tgl_instocklot', 'no_box', 'qty', 'kode_deffect', 'created_at', 'updated_at', 'id_produksi', 'no_model', 'size', 'delivery'];
+    protected $allowedFields    = ['idapsperstyle', 'no_label', 'area', 'tgl_instocklot', 'no_box', 'qty', 'kode_deffect', 'created_at', 'updated_at', 'id_produksi', 'no_model', 'size', 'delivery', 'storage_from'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -143,13 +143,16 @@ class BsModel extends Model
     {
         return $this->whereIn('idapsperstyle', $idaps)->delete();
     }
-    public function getDataForReset($area, $awal, $akhir)
+    public function getDataForReset($awal, $akhir, $area = null,)
     {
-        return $this->select('idbs,idapsperstyle,qty,area')
-            ->where('area', $area)
+        $builder = $this->select('idbs,idapsperstyle,qty,area')
             ->where('tgl_instocklot >=', $awal)
-            ->where('tgl_instocklot <=', $akhir)
-            ->findAll();
+            ->where('tgl_instocklot <=', $akhir);
+        if (!empty($area)) {
+            $builder->where('area', $area);
+        }
+
+        return $builder->get()->getResultArray();
     }
     public function deleteBSArea($area, $awal, $akhir)
     {

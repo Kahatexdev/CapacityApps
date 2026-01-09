@@ -304,11 +304,11 @@
                 $('#produksi').text(formatRound(prod / 24));
                 $('#perbaikan').text(formatRound(pb / 24));
                 $('#perbaikanPersen').text(formatPercent(pb / prod * 100));
-                $('#bsPb').text(formatRound(pbStc));
+                $('#bsPb').text(formatRound(pbStc / 24));
                 $('#bsPbPersen').text(formatPercent(pbStc / pb * 100));
-                $('#goodPb').text(formatRound(pb - pbStc));
+                $('#goodPb').text(formatRound((pb - pbStc) / 24));
                 $('#goodPbPersen').text(formatPercent((pb - pbStc) / pb * 100));
-                $('#stocklot').text(formatRound(stc));
+                $('#stocklot').text(formatRound(stc / 24));
                 $('#stocklotPersen').text(formatPercent(stc / prod * 100));
 
             }

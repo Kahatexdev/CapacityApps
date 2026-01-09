@@ -291,7 +291,7 @@
                         <div class="modal-body align-items-center">
                             <div class="form-group">
                                 <label for="awal">Area</label>
-                                <input type="text" class="form-control" name="area" required>
+                                <input type="text" class="form-control" name="area">
                             </div>
                             <div class="form-group">
                                 <label for="awal">Awal</label>
