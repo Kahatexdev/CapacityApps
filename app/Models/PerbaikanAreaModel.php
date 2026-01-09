@@ -260,15 +260,14 @@ class PerbaikanAreaModel extends Model
 
         // ambil data perbaikan area sesuai tgl produksi
         $stc = $this->db->table('data_bs')
-            ->select('SUM(data_bs.qty/24) AS qty_stc, data_bs.tgl_instocklot,
+            ->select("SUM(data_bs.qty/24) AS qty_stc, data_bs.tgl_instocklot,
             SUM(
                 CASE 
-                    WHEN data_bs.no_label BETWEEN 3000 AND 3999
-                    OR data_bs.no_label BETWEEN 8000 AND 8999
+                    WHEN data_bs.storage_from LIKE 'P%'
                     THEN data_bs.qty/24
                     ELSE 0
                 END
-            ) AS qty_stcPb')
+            ) AS qty_stcPb")
             ->join('apsperstyle', 'data_bs.idapsperstyle=apsperstyle.idapsperstyle')
             ->join('data_model', 'data_model.no_model=apsperstyle.mastermodel')
             ->where('data_bs.tgl_instocklot >=', $theData['awal'])
@@ -306,24 +305,27 @@ class PerbaikanAreaModel extends Model
         }
 
         foreach ($summary as $tgl => $row) {
-            $prod  = (float)$row['prod'];
-            $pb    = (float)$row['pb'];
-            $stc   = (float)$row['stc'];
-            $stcPb = (float)$row['stcPb'];
-
-            $repair = ($prod > 0 && $pb > 0) ? round(($pb / $prod) * 100) : 0;
-            $bsRepair = ($stcPb > 0 && $pb > 0) ? round(($stcPb / $pb) * 100) : 0;
-            $goodRepair = ($pb > 0 || $stcPb > 0) ? round((($pb - $stcPb) / $pb) * 100) : 0;
-            $pureStc = ($stc > 0 || $stcPb > 0) ? round((($stc - $stcPb) / $prod) * 100) : 0;
-
             $summary[$tgl]['prod']  = $row['prod']  ?? 0;
             $summary[$tgl]['pb']    = $row['pb']    ?? 0;
             $summary[$tgl]['stc']   = $row['stc']   ?? 0;
             $summary[$tgl]['stcPb'] = $row['stcPb'] ?? 0;
-            $summary[$tgl]['repair'] = $repair;
-            $summary[$tgl]['bsRepair'] = $bsRepair;
+        }
+
+        foreach ($summary as $tgl => $row) {
+            $prod  = (float) $row['prod'];
+            $pb    = (float) $row['pb'];
+            $stc   = (float) $row['stc'];
+            $stcPb = (float) $row['stcPb'];
+
+            $repair = ($prod > 0 && $pb > 0) ? round(($pb / $prod) * 100) : 0;
+            $bsRepair = ($stcPb > 0 && $pb > 0) ? round(($stcPb / $pb) * 100) : 0;
+            $goodRepair = ($pb > 0) ? round((($pb - $stcPb) / $pb) * 100) : 0;
+            $pureStc = ($prod > 0) ? round((($stc - $stcPb) / $prod) * 100) : 0;
+
+            $summary[$tgl]['repair']     = $repair;
+            $summary[$tgl]['bsRepair']   = $bsRepair;
             $summary[$tgl]['goodRepair'] = $goodRepair;
-            $summary[$tgl]['pureStc'] = $pureStc;
+            $summary[$tgl]['pureStc']    = $pureStc;
         }
 
         // $builder = $this->db->table('produksi p')
