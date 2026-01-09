@@ -303,26 +303,15 @@ class BsModel extends Model
     }
     public function bsPbBulan(array $filters)
     {
-        $builder = $this->select('SUM(data_bs.qty) AS stcPb');
+        $builder = $this->select('SUM(qty) AS stcPb')
+            ->like('storage_from', 'P', 'after');
 
-        // label 3000–3999 dan 8000–8999
-        $builder->groupStart()
-            ->groupStart()
-            ->where('no_label >=', 3000)
-            ->where('no_label <=', 3999)
-            ->groupEnd()
-            ->orGroupStart()
-            ->where('no_label >=', 8000)
-            ->where('no_label <=', 8999)
-            ->groupEnd()
-            ->groupEnd();
+        if (!empty($filters['bulan']) && !empty($filters['tahun'])) {
+            $startDate = sprintf('%04d-%02d-01', $filters['tahun'], $filters['bulan']);
+            $endDate   = date('Y-m-t', strtotime($startDate));
 
-        if (!empty($filters['bulan'])) {
-            $builder->where('MONTH(tgl_instocklot)', $filters['bulan']);
-        }
-
-        if (!empty($filters['tahun'])) {
-            $builder->where('YEAR(tgl_instocklot)', $filters['tahun']);
+            $builder->where('tgl_instocklot >=', $startDate)
+                ->where('tgl_instocklot <=', $endDate);
         }
 
         if (!empty($filters['area'])) {
