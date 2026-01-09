@@ -294,7 +294,7 @@ class DeffectController extends BaseController
          */
         foreach ($apsReduceMap as $idAps => $totalQty) {
             $this->ApsPerstyleModel
-                ->set('sisa', "sisa + {$totalQty}", false) // atomic
+                ->set('sisa', "sisa - {$totalQty}", false) // atomic
                 ->where('idapsperstyle', $idAps)
                 ->update();
         }
