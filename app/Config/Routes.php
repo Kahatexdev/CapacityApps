@@ -19,6 +19,7 @@ $routes->get('chart/getBsMesin', 'DeffectController::getBsMesin');
 $routes->get('chart/dashboardData', 'GodController::dashboardData');
 $routes->get('chart/getDailyProd', 'GodController::getDailyProd');
 $routes->get('oee/fetchData', 'OEEController::fetchData');
+$routes->get('oee/fetchSummary', 'OEEController::fetchSummary');
 $routes->get('exportProd', 'ExcelController::exportProd');
 
 
@@ -1277,6 +1278,7 @@ $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
     // oee
     $routes->get('oee', 'OEEController::index');
 
+    
     // datamontir
     $routes->get('dataMontir', 'IeController::dataMontir');
 
