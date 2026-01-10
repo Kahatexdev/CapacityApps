@@ -67,7 +67,7 @@ class BsModel extends Model
             $this->where('data_bs.area', $theData['area']);
         }
         if (!empty($theData['buyer'])) {
-            $this->where('data_model.kd_buyer_order', $theData['buyer']);
+            $this->like('data_model.kd_buyer_order', $theData['buyer'], 'after');
         }
 
         $data = $this->groupBy('tgl_instocklot, apsperstyle.size, data_bs.kode_deffect')->findAll();
@@ -91,7 +91,7 @@ class BsModel extends Model
             $this->where('area', $theData['area']);
         }
         if (!empty($theData['buyer'])) {
-            $this->where('data_model.kd_buyer_order', $theData['buyer']);
+            $this->like('data_model.kd_buyer_order', $theData['buyer'], 'after');
         }
 
         $result = $this->first();
@@ -113,7 +113,7 @@ class BsModel extends Model
             $this->where('area', $theData['area']);
         }
         if (!empty($theData['buyer'])) {
-            $this->where('data_model.kd_buyer_order', $theData['buyer']);
+            $this->like('data_model.kd_buyer_order', $theData['buyer'], 'after');
         }
 
         return $this->groupBy('Keterangan')

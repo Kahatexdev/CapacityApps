@@ -1664,7 +1664,7 @@ class ApsPerstyleModel extends Model
     public function getDataOrderFetch($listNoModel)
     {
         return $this->db->table('apsperstyle')
-            ->select('idapsperstyle, inisial, size, mastermodel, delivery, qty, factory')
+            ->select('idapsperstyle, inisial, size, mastermodel, delivery, qty, factory, smv, po_plus')
             ->whereIn('mastermodel', $listNoModel)
             ->get()
             ->getResultArray();
@@ -1708,10 +1708,10 @@ class ApsPerstyleModel extends Model
             ->where('qty >', 0)
             ->findAll();
     }
-    public function getWarnaSmv(array $models)
+    public function getWarna($model)
     {
-        return $this->select('mastermodel, size, color, smv')
-            ->whereIn('mastermodel', $models)
+        return $this->select('mastermodel, size, color')
+            ->where('mastermodel', $model)
             ->groupBy('mastermodel')
             ->groupBy('size')
             ->get()

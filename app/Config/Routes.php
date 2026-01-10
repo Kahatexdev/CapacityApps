@@ -104,7 +104,7 @@ $routes->group(
         $routes->get('getDetailOrder', 'ApiController::getDetailOrder');
         $routes->get('getOrderStatus', 'ApiController::getOrderStatus');
         $routes->get('getDataOrderFetch', 'ApiController::getDataOrderFetch');
-        $routes->get('getWarnaSmv', 'ApiController::getWarnaSmv');
+        $routes->get('getWarna', 'ApiController::getWarna');
     }
 );
 
