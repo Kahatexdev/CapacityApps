@@ -1022,9 +1022,9 @@ class ProduksiController extends BaseController
         $id = $this->request->getPost('id');
         $area = $this->request->getPost('area');
         $idaps = $this->request->getPost('idaps');
-        $sisa = $this->request->getPost('sisa');
-        $curr = $this->request->getPost('qtycurrent');
-        $qtynow = $this->request->getPost('qty_prod');
+        $sisa = (int) $this->request->getPost('sisa');
+        $curr = (int) $this->request->getPost('qtycurrent');
+        $qtynow = (int) $this->request->getPost('qty_prod');
         $shiftA = $this->request->getPost('shift_a');
         $shiftB = $this->request->getPost('shift_b');
         $shiftC = $this->request->getPost('shift_c');
