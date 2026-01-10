@@ -95,7 +95,8 @@ class ReturController extends BaseController
         $noModel = $this->request->getGet('model');
 
         $apiUrlPph = api_url('material') . 'pph?model=' . urlencode($noModel);
-        $apiUrlPengiriman = api_url('material') . 'getPengirimanArea?noModel=' . urlencode($noModel);
+        // $apiUrlPengiriman = api_url('material') . 'getPengirimanArea?noModel=' . urlencode($noModel);
+        $apiUrlPengiriman = api_url('material') . 'getPengirimanArea?noModel=' . urlencode($noModel) . '&area=' . $area;
 
         // Ambil data dari API PPH
         $responsePph = file_get_contents($apiUrlPph);

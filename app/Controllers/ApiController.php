@@ -908,19 +908,19 @@ class ApiController extends ResourceController
         return $this->response->setJSON($orderQty);
     }
 
-    public function getWarnaSmv()
+    public function getWarna()
     {
-        $models = $this->request->getGet('no_model');
+        $model = $this->request->getGet('no_model');
 
-        if (empty($models)) {
+        if (empty($model)) {
             return $this->response->setStatusCode(400)->setJSON([]);
         }
 
-        $models = is_array($models)
-            ? $models
-            : explode(',', $models);
+        // $models = is_array($models)
+        //     ? $models
+        //     : explode(',', $models);
 
-        $data = $this->ApsPerstyleModel->getWarnaSmv($models);
+        $data = $this->ApsPerstyleModel->getWarna($model);
 
         return $this->response->setJSON($data);
     }
