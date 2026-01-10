@@ -32,16 +32,15 @@
 
                 <div class="row align-items-center mb-3">
                     <div class="col-md-6">
-                        <h5 class="fw-bold mb-0">Overall Equipment Effectiveness</h5>
-                        <h6 class="fw-bold mb-0">
-                            Summary KPI
+                        <h5 class="fw-bold mb-0">
+                            Summary Perbaikan
                             <?=
                             (!empty($filter['awal']) && !empty($filter['akhir']) ? " Tanggal {$filter['awal']} s/d {$filter['akhir']}" : '') .
                                 (!empty($filter['area'])  ? " Area {$filter['area']}" : '') .
                                 (!empty($filter['buyer']) ? " Buyer {$filter['buyer']}" : '') .
                                 (!empty($filter['pdk'])   ? " No Model {$filter['pdk']}" : '')
                             ?>
-                        </h6>
+                        </h5>
                     </div>
                 </div>
 
@@ -50,13 +49,13 @@
                         <span class="fw-bold">Total Produksi :</span>
                         <span class="fw-bold text-primary ms-1"><?= ($total['prod'] > 0) ? round($total['prod'], 2) . "dz" : '-' ?></span><br>
                         <span class="fw-bold">In Perbaikan :</span>
-                        <span class="fw-bold text-primary ms-1"><?= ($total['pb'] > 0) ? round($total['pb'], 2) . "dz" : '-' ?></span><br>
+                        <span class="fw-bold text-primary ms-1"><?= ($total['pb'] > 0) ? round($total['pb'], 2) . "dz" : '-' ?></span> (<?= ($total['pb'] > 0) ? round($total['pb'] / $total['prod'] * 100, 2) . "%" : '-' ?>)<br>
                         <span class="fw-bold">Out Perbaikan Good :</span>
-                        <span class="fw-bold text-primary ms-1"><?= ($total['goodPb'] > 0) ? round($total['goodPb'], 2) . "dz" : '-' ?></span> <br>
+                        <span class="fw-bold text-primary ms-1"><?= ($total['goodPb'] > 0) ? round($total['goodPb'], 2) . "dz" : '-' ?></span> (<?= ($total['goodPb'] > 0) ? round($total['goodPb'] / $total['pb'] * 100, 2) . "%" : '-' ?>)<br>
                         <span class="fw-bold">Deffect Perbaikan :</span>
-                        <span class="fw-bold text-primary ms-1"><?= ($total['stcPb'] > 0) ? round($total['stcPb'], 2) . "dz" : '-' ?></span><br>
+                        <span class="fw-bold text-primary ms-1"><?= ($total['stcPb'] > 0) ? round($total['stcPb'], 2) . "dz" : '-' ?></span> (<?= ($total['stcPb'] > 0) ? round($total['stcPb'] / $total['pb'] * 100, 2) . "%" : '-' ?>)<br>
                         <span class="fw-bold">Total Stocklot :</span>
-                        <span class="fw-bold text-primary ms-1"><?= ($total['stc'] > 0) ? round($total['stc'], 2) . "dz" : '-' ?></span>
+                        <span class="fw-bold text-primary ms-1"><?= ($total['stc'] > 0) ? round($total['stc'], 2) . "dz" : '-' ?></span>(<?= ($total['stc'] > 0) ? round($total['stc'] / $total['prod'] * 100, 2) . "%" : '-' ?>)
                     </div>
                 </div>
             </div>
