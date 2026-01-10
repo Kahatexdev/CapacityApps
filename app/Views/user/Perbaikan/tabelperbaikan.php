@@ -65,7 +65,7 @@
                                 $chartColors = ['#845ec2', '#d65db1', '#ff6f91', '#ff9671', '#ffc75f', '#f9f871', '#008f7a', '#b39cd0', '#c34a36', '#4b4453', '#4ffbdf', '#936c00', '#c493ff', '#296073'];
 
                                 $no = 0;
-                                foreach ($chart as $index => $ch) :
+                                foreach ($topTen as $index => $ch) :
                                     $no++;
                                     // Ulangi warna jika index lebih besar dari jumlah warna yang tersedia
                                     $color = $chartColors[$index % count($chartColors)];

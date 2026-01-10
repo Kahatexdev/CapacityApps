@@ -24,6 +24,118 @@
         });
     </script>
 <?php endif; ?>
+<style>
+    .num {
+        font-weight: 600;
+    }
+
+    .percent {
+        display: block;
+        font-size: 0.8em;
+        color: #6c757d;
+        margin-top: 2px;
+    }
+
+    td {
+        vertical-align: middle;
+    }
+</style>
+
+<div class="row">
+    <div class="col">
+        <div class="card mt-2">
+            <div class="card-header">
+
+                <div class="row align-items-center mb-3">
+                    <div class="col-md-6">
+                        <h5 class="fw-bold mb-0">
+                            Summary Perbaikan
+                            <?=
+                            (!empty($filter['awal']) && !empty($filter['akhir']) ? " Tanggal {$filter['awal']} s/d {$filter['akhir']}" : '') .
+                                (!empty($filter['area'])  ? " Area {$filter['area']}" : '') .
+                                (!empty($filter['buyer']) ? " Buyer {$filter['buyer']}" : '') .
+                                (!empty($filter['pdk'])   ? " No Model {$filter['pdk']}" : '')
+                            ?>
+                        </h5>
+                    </div>
+                </div>
+
+                <div class="row align-items-center border-top pt-3">
+                    <div class="col-md-6">
+                        <span class="fw-bold">Total Produksi :</span>
+                        <span class="fw-bold text-primary ms-1"><?= ($total['prod'] > 0) ? round($total['prod'], 2) . "dz" : '-' ?></span><br>
+                        <span class="fw-bold">In Perbaikan :</span>
+                        <span class="fw-bold text-primary ms-1"><?= ($total['pb'] > 0) ? round($total['pb'], 2) . "dz" : '-' ?></span> (<?= ($total['pb'] > 0) ? round($total['pb'] / $total['prod'] * 100, 2) . "%" : '-' ?>)<br>
+                        <span class="fw-bold">Out Perbaikan Good :</span>
+                        <span class="fw-bold text-primary ms-1"><?= ($total['goodPb'] > 0) ? round($total['goodPb'], 2) . "dz" : '-' ?></span> (<?= ($total['goodPb'] > 0) ? round($total['goodPb'] / $total['pb'] * 100, 2) . "%" : '-' ?>)<br>
+                        <span class="fw-bold">Deffect Perbaikan :</span>
+                        <span class="fw-bold text-primary ms-1"><?= ($total['stcPb'] > 0) ? round($total['stcPb'], 2) . "dz" : '-' ?></span> (<?= ($total['stcPb'] > 0) ? round($total['stcPb'] / $total['pb'] * 100, 2) . "%" : '-' ?>)<br>
+                        <span class="fw-bold">Total Stocklot :</span>
+                        <span class="fw-bold text-primary ms-1"><?= ($total['stc'] > 0) ? round($total['stc'], 2) . "dz" : '-' ?></span>(<?= ($total['stc'] > 0) ? round($total['stc'] / $total['prod'] * 100, 2) . "%" : '-' ?>)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="card mt-2">
+
+            <div class="card-body">
+                <div class="datatable">
+                    <table id="dataTable1" class="display striped" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>TANGGAL</th>
+                                <th>PROD (DZ)</th>
+                                <th>IN PB (DZ)</th>
+                                <th>GOOD REPAIR (DZ)</th>
+                                <th>DEFFECT PERBAIKAN (DZ)</th>
+                                <th>IN STOCKLOT All Storage (DZ)</th>
+                                <th>PURE STOCKLOT (Kecuali PB) (DZ)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($getData as $tgl => $id): ?>
+                                <tr>
+                                    <td><?= esc($tgl) ?></td>
+
+                                    <td class="num"><?= round($id['prod'], 2) ?></td>
+
+                                    <td>
+                                        <span class="num"><?= round($id['pb'], 2) ?></span>
+                                        <span class="percent"><?= $id['pb'] > 0 ? round($id['pb'] / $id['prod'] * 100, 1) : 0 ?>%</span>
+                                    </td>
+
+                                    <td>
+                                        <span class="num"><?= round($id['goodRepair'], 2) ?></span>
+                                        <span class="percent"><?= $id['goodRepair'] > 0 ? round($id['goodRepair'] / $id['pb'] * 100, 1) : 0 ?>%</span>
+                                    </td>
+
+                                    <td>
+                                        <span class="num"><?= round($id['stcPb'], 2) ?></span>
+                                        <span class="percent"><?= $id['stcPb'] > 0 ? round($id['stcPb'] / $id['pb'] * 100, 1) : 0 ?>%</span>
+                                    </td>
+
+                                    <td>
+                                        <span class="num"><?= round($id['stc'], 2) ?></span>
+                                        <span class="percent"><?= $id['stc'] > 0 ? round($id['stc'] / $id['prod'] * 100, 1) : 0 ?>%</span>
+                                    </td>
+
+                                    <td>
+                                        <span class="num"><?= round($id['pureStc'], 2) ?></span>
+                                        <span class="percent"><?= $id['pureStc'] > 0 ? round($id['pureStc'] / $id['stc'] * 100, 1) : 0 ?>%</span>
+                                    </td>
+                                </tr>
+                            <?php endforeach ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col">
         <div class="card mt-2">
@@ -55,7 +167,7 @@
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th>Keterangan</th>
+                                    <th>TOP 10 Perbaikan</th>
                                     <th>Jumlah</th>
                                 </tr>
                             </thead>
@@ -65,7 +177,7 @@
                                 $chartColors = ['#845ec2', '#d65db1', '#ff6f91', '#ff9671', '#ffc75f', '#f9f871', '#008f7a', '#b39cd0', '#c34a36', '#4b4453', '#4ffbdf', '#936c00', '#c493ff', '#296073'];
 
                                 $no = 0;
-                                foreach ($chart as $index => $ch) :
+                                foreach ($topTen as $index => $ch) :
                                     $no++;
                                     // Ulangi warna jika index lebih besar dari jumlah warna yang tersedia
                                     $color = $chartColors[$index % count($chartColors)];
@@ -87,53 +199,7 @@
     </div>
 </div>
 
-<div class=" row">
-    <div class="col">
-        <div class="card">
 
-            <div class="card-body">
-                <div class="datatable">
-                    <table id="dataTable1" class="display  striped" style="width:100%">
-                        <thead>
-
-                            <tr>
-                                <th>Tgl In Perbaikan</th>
-                                <th>Area</th>
-                                <th>Buyer</th>
-                                <th>No Model</th>
-                                <th>Style</th>
-                                <th>No Label</th>
-                                <th>No Box</th>
-                                <th>Qty </th>
-                                <th>Kode Deffect</th>
-                                <th>Keterangan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                            <?php foreach ($databs as $bs) : ?>
-                                <tr>
-                                    <td><?= $bs['tgl_perbaikan'] ?></td>
-                                    <td><?= $bs['area'] ?></td>
-                                    <td><?= $bs['kd_buyer_order'] ?></td>
-                                    <td><?= $bs['mastermodel'] ?></td>
-                                    <td><?= $bs['size'] ?></td>
-                                    <td><?= $bs['no_label'] ?></td>
-                                    <td><?= $bs['no_box'] ?></td>
-                                    <td><?= $bs['qty'] ?> pcs</td>
-                                    <td><?= $bs['kode_deffect'] ?></td>
-                                    <td><?= $bs['Keterangan'] ?></td>
-                                </tr>
-                            <?php endforeach ?>
-                        </tbody>
-
-                    </table>
-
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 <script>

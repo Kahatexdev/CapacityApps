@@ -19,6 +19,7 @@ $routes->get('chart/getBsMesin', 'DeffectController::getBsMesin');
 $routes->get('chart/dashboardData', 'GodController::dashboardData');
 $routes->get('chart/getDailyProd', 'GodController::getDailyProd');
 $routes->get('oee/fetchData', 'OEEController::fetchData');
+$routes->get('oee/fetchSummary', 'OEEController::fetchSummary');
 $routes->get('exportProd', 'ExcelController::exportProd');
 
 
@@ -436,6 +437,8 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->post('saveRepeat', 'OrderController::saveRepeat');
     $routes->get('flowProses', 'OrderController::flowProses');
     $routes->post('semuaOrder/importFlowproses', 'OrderController::importFlowproses');
+    $routes->post('historySpk', 'OrderController::historySpk');
+    $routes->get('exportHistorySpk', 'ExcelController::exportHistorySpk');
 
     // mesin
     $routes->get('datamesin', 'MesinController::indexPlan');
@@ -542,6 +545,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     // perbaikan
     $routes->get('perbaikanArea', 'DeffectController::perbaikanArea');
     $routes->post('viewPerbaikan', 'DeffectController::viewPerbaikan');
+    $routes->get('detailViewPerbaikan', 'DeffectController::detailViewPerbaikan');
     $routes->post('exportExcelPerbaikan', 'ExcelController::exportExcelPerbaikan');
     $routes->post('summaryGlobalPbArea', 'ExcelController::summaryGlobalPbArea');
 
@@ -628,6 +632,9 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     //summary pakai
     $routes->get('jatah_bahan_baku', 'MaterialController::jatahBahanBaku');
     $routes->get('export_excel_jatah_bb', 'ExcelController::exportExcelJatahNoModel');
+
+    // oe
+    $routes->get('oee', 'OEEController::index');
 
     // pengaduan
     $routes->get('pengaduan', 'PengaduanController::index');
@@ -876,6 +883,9 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('pengaduan', 'PengaduanController::index');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
+
+    // oee
+    $routes->get('oee', 'OEEController::index');
 });
 
 // user
@@ -1039,6 +1049,9 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('pengaduan', 'PengaduanController::index');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
+
+    // oee
+    $routes->get('oee', 'OEEController::index');
 });
 
 // sudo
@@ -1187,6 +1200,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('perbaikanArea', 'DeffectController::perbaikanArea');
     $routes->post('importperbaikanarea', 'ProduksiController::importPerbaikanArea');
     $routes->post('viewPerbaikan', 'DeffectController::viewPerbaikan');
+    $routes->get('detailViewPerbaikan', 'DeffectController::detailViewPerbaikan');
     $routes->post('exportExcelPerbaikan', 'ExcelController::exportExcelPerbaikan');
     $routes->post('summaryGlobalPbArea', 'ExcelController::summaryGlobalPbArea');
     $routes->post('exportExcelDeffect', 'ExcelController::exportExcelDeffect');
@@ -1260,6 +1274,16 @@ $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
     $routes->get('pengaduan', 'PengaduanController::index');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
+
+    // oee
+    $routes->get('oee', 'OEEController::index');
+
+    
+    // datamontir
+    $routes->get('dataMontir', 'IeController::dataMontir');
+
+    // oee
+    $routes->get('oee', 'OEEController::index');
 });
 
 // rosso

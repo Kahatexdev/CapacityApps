@@ -619,7 +619,7 @@ class MaterialController extends BaseController
                     $currentDate = getNextNonHoliday($currentDate, $liburDates);
                 }
 
-                // kalau hari ini Minggu â†’ pakai 00:00:00
+                // kalau hari ini Minggu → pakai 00:00:00
                 if ($isSunday) {
                     $time = "00:00:00";
                 } else {
@@ -635,7 +635,7 @@ class MaterialController extends BaseController
             return $result;
         }
 
-        // Spandex & Karet â†’ cek apakah hari ini Jumat atau Sabtu
+        // Spandex & Karet → cek apakah hari ini Jumat atau Sabtu
         if ($day === 'Sunday') {
             $initialOffsetBenang  = 0;
             $initialOffsetNylon   = 0;
@@ -876,7 +876,7 @@ class MaterialController extends BaseController
                 // Cocokkan size
                 $matchSize = ($size === $styleSize);
 
-                // Jika size cocok → ambil data dari API item
+                // Jika size cocok ? ambil data dari API item
                 $itemType  = $matchSize ? ($items['item_type'] ?? null) : null;
                 $kodeWarna = $matchSize ? ($items['kode_warna'] ?? null) : null;
                 $color     = $matchSize ? ($items['color'] ?? null) : null;
@@ -1970,10 +1970,10 @@ class MaterialController extends BaseController
                 'tgl_pakai'          => $pemesanan['tgl_pakai'],
                 'id_total_pemesanan' => $pemesanan['id_total_pemesanan'],
                 'ttl_jl_mc'          => (int)($pemesanan['ttl_jl_mc'] ?? 0),
-                'ttl_kg'             => (float)($pemesanan['ttl_kg'] ?? 0),   // â† JANGAN number_format di sini
+                'ttl_kg'             => (float)($pemesanan['ttl_kg'] ?? 0),   // ← JANGAN number_format di sini
                 'po_tambahan'        => (int)($pemesanan['po_tambahan'] ?? 0),
-                'ttl_keb'            => (float)$ttlKeb,                       // â† hasil hitung, mentah
-                'kg_out'             => (float)($pemesanan['kgs_out'] ?? 0),  // â† mentah
+                'ttl_keb'            => (float)$ttlKeb,                       // ← hasil hitung, mentah
+                'kg_out'             => (float)($pemesanan['kgs_out'] ?? 0),  // ← mentah
                 'lot_out'            => $pemesanan['lot_out'],
                 // field retur kosong
                 'tgl_retur'          => null,
@@ -2043,11 +2043,11 @@ class MaterialController extends BaseController
                 'ttl_jl_mc'          => null,
                 'ttl_kg'             => null,
                 'po_tambahan'        => null,
-                'ttl_keb'            => (float)$ttlKeb,                        // â† mentah
-                'kg_out'             => 0.0,                                   // â† angka 0
+                'ttl_keb'            => (float)$ttlKeb,                        // ← mentah
+                'kg_out'             => 0.0,                                   // ← angka 0
                 'lot_out'            => null,
                 'tgl_retur'          => $retur['tgl_retur'],
-                'kgs_retur'          => (float)($retur['kgs_retur'] ?? 0),     // â† mentah
+                'kgs_retur'          => (float)($retur['kgs_retur'] ?? 0),     // ← mentah
                 'lot_retur'          => $retur['lot_retur'],
                 'ket_gbn'            => $retur['keterangan_gbn'],
             ];
@@ -2221,7 +2221,7 @@ class MaterialController extends BaseController
             $totalPo = $this->ApsPerstyleModel->totalPo($noModel)['totalPo'] ?? 0;
         }
 
-        // Render full pageâ€”AJAX akan mengambil ulang #table-container saja
+        // Render full page—AJAX akan mengambil ulang #table-container saja
         return view(session()->get('role') . '/Material/jatahBahanBaku', [
             'role'            => session()->get('role'),
             'title'           => 'Jatah Bahan Baku',
@@ -2255,23 +2255,114 @@ class MaterialController extends BaseController
         ];
         return view(session()->get('role') . '/Material/report-datang-benang', $data);
     }
+
     public function filterDatangBenang()
     {
-        $key = $this->request->getGet('key');
-        $tanggalAwal = $this->request->getGet('tanggal_awal');
+        $key          = $this->request->getGet('key');
+        $tanggalAwal  = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
-        $poPlus = $this->request->getGet('po_plus');
+        $poPlus       = $this->request->getGet('po_plus');
 
-        $apiUrl = api_url('material') . 'filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir . '&po_plus=' . $poPlus;
-        $material = @file_get_contents($apiUrl);
+        $apiUrl = api_url('material') . 'filterDatangBenang' . '?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir . '&po_plus=' . $poPlus;
 
-        $models = [];
-        if ($material !== FALSE) {
-            $models = json_decode($material, true);
+        $response = @file_get_contents($apiUrl);
+        $data = $response ? json_decode($response, true) : [];
+
+        if (empty($data)) {
+            return $this->response->setJSON([]);
         }
 
-        return $this->response->setJSON($models);
+        $noModels = array_unique(array_column($data, 'no_model'));
+        $qtyPcsRaw = $this->ApsPerstyleModel->getQtyOrderByNoModel($noModels);
+
+        $sumQtyBySize = [];
+        foreach ($qtyPcsRaw as $row) {
+            $model = $row['mastermodel'];
+            $size  = $row['size'];
+            $qty   = (int) $row['qty'];
+
+            $sumQtyBySize[$model][$size] =
+                ($sumQtyBySize[$model][$size] ?? 0) + $qty;
+        }
+
+        $styleKeyMap = [];
+
+        foreach ($data as $dt) {
+            $keyStyle = implode('|', [
+                $dt['no_model'],
+                $dt['item_type'],
+                $dt['kode_warna'],
+                $dt['warna']
+            ]);
+
+            if (!isset($styleKeyMap[$keyStyle])) {
+                $styleKeyMap[$keyStyle] = [
+                    'no_model'   => $dt['no_model'],
+                    'item_type'  => $dt['item_type'],
+                    'kode_warna' => $dt['kode_warna'],
+                    'warna'      => $dt['warna'],
+                ];
+            }
+        }
+
+        $styleMap = [];
+
+        foreach ($styleKeyMap as $keyStyle => $param) {
+
+            $styleUrl = api_url('material') . 'getStyleSizeByBb' . '?no_model=' . urlencode($param['no_model']) . '&item_type=' . urlencode($param['item_type']) . '&kode_warna=' . urlencode($param['kode_warna']) . '&warna=' . urlencode($param['warna']);
+
+            $styleResponse = @file_get_contents($styleUrl);
+            $styles = $styleResponse ? json_decode($styleResponse, true) : [];
+
+            $styleMap[$keyStyle] = $styles;
+        }
+
+        foreach ($data as $i => $dt) {
+
+            $keyStyle = implode('|', [
+                $dt['no_model'],
+                $dt['item_type'],
+                $dt['kode_warna'],
+                $dt['warna']
+            ]);
+
+            $styles = $styleMap[$keyStyle] ?? [];
+
+            $ttlKgs = 0;
+            $ttlQty = 0;
+
+            foreach ($styles as $style) {
+
+                $styleSize = $style['style_size'];
+                $qty = $sumQtyBySize[$dt['no_model']][$styleSize] ?? 0;
+
+                if ($qty <= 0) {
+                    continue;
+                }
+
+                if (
+                    isset($style['item_type'])
+                    && stripos($style['item_type'], 'JHT') !== false
+                ) {
+                    $kebutuhan = (float) ($style['kgs'] ?? 0);
+                } else {
+                    $kebutuhan = (
+                        ($qty * $style['gw'] * $style['composition'] / 100 / 1000)
+                        * (1 + ($style['loss'] / 100))
+                    );
+                }
+
+                $ttlKgs += $kebutuhan;
+                $ttlQty += $qty;
+            }
+
+            $data[$i]['kgs_material'] = round($ttlKgs, 2);
+        }
+
+        return $this->response->setJSON($data);
     }
+
+
     public function reportPoBenang()
     {
         $data = [
@@ -2807,7 +2898,7 @@ class MaterialController extends BaseController
         if (empty($bulan) || !preg_match('/^\d{4}\-\d{2}$/', $bulan)) {
             return $this->response
                 ->setStatusCode(400)
-                ->setJSON(['error' => 'Parameter â€œbulanâ€ harus dalam format YYYY-MM']);
+                ->setJSON(['error' => 'Parameter “bulan” harus dalam format YYYY-MM']);
         }
 
         $timestamp     = strtotime($bulan . '-01');
@@ -2987,7 +3078,7 @@ class MaterialController extends BaseController
         $db->transComplete();
 
         // ambil data terbaru (sesuaikan area/filternya kalau perlu)
-        // asumsikan ada method getStock(area) — sesuaikan argumen area sesuai flow aplikasi
+        // asumsikan ada method getStock(area) � sesuaikan argumen area sesuai flow aplikasi
         $area = $this->request->getPost('area') ?? null;
         $stock = $this->stockArea->getStock($area);
         $role = session()->get('role');

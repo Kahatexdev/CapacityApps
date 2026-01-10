@@ -982,6 +982,41 @@ class ProduksiController extends BaseController
         }
     }
 
+    // public function editproduksi()
+    // {
+    //     $id = $this->request->getPost('id');
+    //     $area = $this->request->getPost('area');
+    //     $idaps = $this->request->getPost('idaps');
+    //     $sisa = $this->request->getPost('sisa');
+    //     $curr = $this->request->getPost('qtycurrent');
+    //     $qtynow = $this->request->getPost('qty_prod');
+    //     $shiftA = $this->request->getPost('shift_a');
+    //     $shiftB = $this->request->getPost('shift_b');
+    //     $shiftC = $this->request->getPost('shift_c');
+    //     $realqty = $sisa + $curr;
+    //     $updateqty = $realqty - $qtynow;
+    //     $updateSisaAps = $this->ApsPerstyleModel->update($idaps, ['sisa' => $updateqty]);
+    //     if ($updateSisaAps) {
+    //         $update = [
+    //             'no_mesin' => $this->request->getPost('no_mc'),
+    //             'no_label' => $this->request->getPost('no_label'),
+    //             'no_box' => $this->request->getPost('no_box'),
+    //             'qty_produksi' => $qtynow,
+    //             'shift_a' => $shiftA,
+    //             'shift_b' => $shiftB,
+    //             'shift_c' => $shiftC,
+    //             'tgl_produksi' => $this->request->getPost('tgl_prod'),
+    //         ];
+    //         $u = $this->produksiModel->update($id, $update);
+    //         if ($u) {
+    //             return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('success', 'Berhasil Update Data Produksi');
+    //         } else {
+    //             return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Data Produksi');
+    //         }
+    //     } else {
+    //         return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Sisa Order');
+    //     }
+    // }
     public function editproduksi()
     {
         $id = $this->request->getPost('id');
@@ -996,26 +1031,44 @@ class ProduksiController extends BaseController
         $realqty = $sisa + $curr;
         $updateqty = $realqty - $qtynow;
         $updateSisaAps = $this->ApsPerstyleModel->update($idaps, ['sisa' => $updateqty]);
-        if ($updateSisaAps) {
-            $update = [
-                'no_mesin' => $this->request->getPost('no_mc'),
-                'no_label' => $this->request->getPost('no_label'),
-                'no_box' => $this->request->getPost('no_box'),
-                'qty_produksi' => $qtynow,
-                'shift_a' => $shiftA,
-                'shift_b' => $shiftB,
-                'shift_c' => $shiftC,
-                'tgl_produksi' => $this->request->getPost('tgl_prod'),
-            ];
-            $u = $this->produksiModel->update($id, $update);
-            if ($u) {
-                return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('success', 'Berhasil Update Data Produksi');
-            } else {
-                return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Data Produksi');
-            }
-        } else {
-            return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Sisa Order');
+        if (!$updateSisaAps) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Gagal Update Sisa Order'
+            ]);
         }
+        $update = [
+            'no_mesin' => $this->request->getPost('no_mc'),
+            'no_label' => $this->request->getPost('no_label'),
+            'no_box' => $this->request->getPost('no_box'),
+            'qty_produksi' => $qtynow,
+            'shift_a' => $shiftA,
+            'shift_b' => $shiftB,
+            'shift_c' => $shiftC,
+            'tgl_produksi' => $this->request->getPost('tgl_prod'),
+        ];
+        $u = $this->produksiModel->update($id, $update);
+        if (!$u) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Gagal Update Data Produksi'
+            ]);
+        }
+        // ✅ sukses → kirim balik data untuk update view
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data' => [
+                'id_produksi'  => $id,
+                'tgl_produksi'  => $update['tgl_produksi'],
+                'no_mesin'      => $update['no_mesin'],
+                'no_box'        => $update['no_box'],
+                'no_label'      => $update['no_label'],
+                'shift_a'      => $update['shift_a'],
+                'shift_b'      => $update['shift_b'],
+                'shift_c'      => $update['shift_c'],
+                'qty_produksi'  => $qtynow,
+            ]
+        ]);
     }
 
     public function importbssetting()
@@ -1073,72 +1126,133 @@ class ProduksiController extends BaseController
     }
     private function prossesBs($batchData, $db, &$failedRows)
     {
-        $db->transStart();
+        $db = $this->db;
+        // ===============================
+        // CONTAINER
+        // ===============================
+        $apsCache         = []; // key => aps row | null
+        $apsUpdateBuffer  = []; // idaps => sisa baru
+        $bsInsertBatch    = [];
+        $failedRows       = [];
+
+        // ===============================
+        // LOOP EXCEL
+        // ===============================
         foreach ($batchData as $batchItem) {
             $rowIndex = $batchItem['rowIndex'];
-            $data = $batchItem['data'];
+            $data     = $batchItem['data'];
 
             try {
-                $no_model = $data[21];
-                $style = $data[4];
-                $area = $data[26];
-                $validate = [
-                    'no_model' => $no_model,
-                    'style' => $style,
-                    'area' => $area,
-                ];
-                $idAps = $this->ApsPerstyleModel->getIdForBs($validate);
-                if (!$idAps) {
-                    if ($data[0] == null) {
-                        break; // Skip empty rows
-                    } else {
-                        $failedRows[] = "style tidak ditemukan " . $rowIndex;
-                        continue;
-                    }
-                } else {
-                    $id = $idAps['idapsperstyle'];
-                    $sisaOrder = $idAps['sisa'];
-                    $qtyOrder = $idAps['qty'];
-                    $qtyerp = $data[12];
-                    $qty = str_replace('-', '', $qtyerp);
-                    $sisaQty = $sisaOrder + $qty;
-                    $tgl = $data[1];
-                    $date = new DateTime($tgl);
-                    $tglprod = $date->format('Y-m-d');
-                    $kodeDeffect =  substr($data[29] ?? '20A', 0, 3);
-
-                    // $strReplace = str_replace('.', '-', $tglprod);
-                    // $dateTime = \DateTime::createFromFormat('d-m-Y', $strReplace);
-
-
-                    $datainsert = [
-                        'tgl_instocklot' => $tglprod,
-                        'idapsperstyle' => $id,
-                        'area' => $area,
-                        'no_label' => $data[22],
-                        'no_box' => $data[23],
-                        'qty' => $qty,
-                        'kode_deffect' => $kodeDeffect,
-
-                    ];
-                    $insert = $this->bsModel->insert($datainsert);
-                    if ($insert) {
-                        $updateBs = $this->ApsPerstyleModel->update($id, ['sisa' => $sisaQty]);
-                        if (!$updateBs) {
-                            $failedRows[] = "baris" . $rowIndex . "gagal Update Data BS";
-                            continue;
-                        }
-                    } else {
-
-                        $failedRows[] = "baris " . $rowIndex . "gagal Insert data, ada kolom yang kosong";
-                        continue;
-                    }
+                // Skip empty row
+                if (empty($data[0])) {
+                    continue;
                 }
-            } catch (\Exception $e) {
-                $failedRows[] = $rowIndex;
+
+                // Mapping
+                $noModel = $data[21] ?? null;
+                $style   = $data[4]  ?? null;
+                $area    = $data[26] ?? null;
+
+                if (!$noModel || !$style || !$area) {
+                    $failedRows[] = "Baris {$rowIndex}: data utama kosong";
+                    continue;
+                }
+
+                $cacheKey = "{$noModel}|{$style}|{$area}";
+
+                // ===============================
+                // APS QUERY (CACHED PER KEY)
+                // ===============================
+                if (!array_key_exists($cacheKey, $apsCache)) {
+
+                    $aps = $this->ApsPerstyleModel->getIdForBs([
+                        'no_model' => $noModel,
+                        'style'    => $style,
+                        'area'     => $area,
+                    ]);
+
+                    // Cache walaupun null (biar ga query ulang)
+                    $apsCache[$cacheKey] = $aps ?: null;
+                }
+
+                if ($apsCache[$cacheKey] === null) {
+                    $failedRows[] = "Baris {$rowIndex}: APS tidak ditemukan";
+                    continue;
+                }
+
+                $aps = $apsCache[$cacheKey];
+
+                // ===============================
+                // VALIDASI QTY
+                // ===============================
+                $qty = (int) str_replace('-', '', $data[12] ?? 0);
+                if ($qty <= 0) {
+                    continue;
+                }
+
+                // ===============================
+                // PARSE TANGGAL
+                // ===============================
+                try {
+                    $tglProd = (new \DateTime($data[1]))->format('Y-m-d');
+                } catch (\Exception $e) {
+                    $failedRows[] = "Baris {$rowIndex}: tanggal invalid";
+                    continue;
+                }
+
+                // ===============================
+                // SIAPKAN INSERT BS
+                // ===============================
+                $bsInsertBatch[] = [
+                    'tgl_instocklot' => $tglProd,
+                    'idapsperstyle'  => $aps['idapsperstyle'],
+                    'area'           => $area,
+                    'no_label'       => $data[22] ?? null,
+                    'no_box'         => $data[23] ?? null,
+                    'storage_from'         => $data[10] ?? null,
+                    'qty'            => $qty,
+                    'kode_deffect'   => substr($data[29] ?? '20A', 0, 3),
+                ];
+
+                // ===============================
+                // AKUMULASI SISA APS
+                // ===============================
+                if (!isset($apsUpdateBuffer[$aps['idapsperstyle']])) {
+                    $apsUpdateBuffer[$aps['idapsperstyle']] = $aps['sisa'];
+                }
+
+                $apsUpdateBuffer[$aps['idapsperstyle']] += $qty;
+            } catch (\Throwable $e) {
+                $failedRows[] = "Baris {$rowIndex}: {$e->getMessage()}";
             }
         }
+
+        // ===============================
+        // EXECUTE DATABASE
+        // ===============================
+        $db->transStart();
+
+        // INSERT BS (BATCH)
+        if (!empty($bsInsertBatch)) {
+            $this->bsModel->insertBatch($bsInsertBatch);
+        }
+
+        // UPDATE APS (PER ID)
+        foreach ($apsUpdateBuffer as $idAps => $sisaBaru) {
+            $this->ApsPerstyleModel
+                ->set('sisa', $sisaBaru)
+                ->where('idapsperstyle', $idAps)
+                ->update();
+        }
+
         $db->transComplete();
+
+        // ===============================
+        // TRANSACTION CHECK
+        // ===============================
+        if ($db->transStatus() === false) {
+            throw new \RuntimeException('Import gagal, transaction rollback');
+        }
     }
     public function plusPacking()
     {

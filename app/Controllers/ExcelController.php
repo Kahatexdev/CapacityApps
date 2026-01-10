@@ -3568,11 +3568,11 @@ class ExcelController extends BaseController
             $poPlus    = $list['poPlus'] ?? [];
 
             if (!empty($material)) {
-                // 🔹 Ambil semua key untuk query massal
+                // ?? Ambil semua key untuk query massal
                 $noModels = array_unique(array_column($material, 'no_model'));
                 $sizes = array_unique(array_column($material, 'style_size'));
 
-                // 🔹 Query massal (1x per jenis data)
+                // ?? Query massal (1x per jenis data)
                 $qtyOrderList = $this->ApsPerstyleModel->getAllSisaPerSize($area, $noModels, $sizes);
                 $bsMesinList  = $this->bsMesinModel->getAllBsMesin($area, $noModels, $sizes);
                 $idApsList    = $this->ApsPerstyleModel->getAllIdForBs($area, $noModels, $sizes);
@@ -3586,7 +3586,7 @@ class ExcelController extends BaseController
                 $bsSettingAll = $this->bsModel->getAllTotalBsSet($allIds);
                 $prodAll      = $this->produksiModel->getAllProd($allIds);
 
-                // 🔹 Siapkan hasil kalkulasi
+                // ?? Siapkan hasil kalkulasi
                 $materialIndex = [];
                 foreach ($material as $item) {
                     $noModel = $item['no_model'];
@@ -3631,7 +3631,7 @@ class ExcelController extends BaseController
                     ];
                 }
 
-                // 🔹 Index data kirim & po tambahan
+                // ?? Index data kirim & po tambahan
                 $kirimIndex = [];
                 foreach ($kirim as $krm) {
                     $key = $krm['no_model'] . '|' . $krm['item_type'] . '|' . $krm['kode_warna'];
@@ -3644,7 +3644,7 @@ class ExcelController extends BaseController
                     $poPlusIndex[$key] = $plus['ttl_tambahan_kg'];
                 }
 
-                // 🔹 Gabungkan semua ke listRetur
+                // ?? Gabungkan semua ke listRetur
                 foreach ($listRetur as &$retur) {
                     $noModel   = $retur['no_model'] ?? '';
                     $itemType  = $retur['item_type'] ?? '';
@@ -3675,7 +3675,7 @@ class ExcelController extends BaseController
                 log_message('debug', '=== HASIL OPTIMIZED listRetur === ' . print_r($listRetur, true));
             }
         } else {
-            log_message('warning', "⚠️ Tidak ada data listRetur untuk area: $area dan tanggal: $tglRetur");
+            log_message('warning', "?? Tidak ada data listRetur untuk area: $area dan tanggal: $tglRetur");
             $listRetur = [];
         }
         if ($listRetur === null) {
@@ -3848,7 +3848,7 @@ class ExcelController extends BaseController
 
         $data = $this->ApsPerstyleModel->getDataOrder($validate); // ambil data semua order sesuai yg di filter
 
-        // ✅ 2. Kelompokkan berdasarkan model + size dan kumpulkan idaps
+        // ? 2. Kelompokkan berdasarkan model + size dan kumpulkan idaps
         $groupData = [];
         foreach ($data as $row) {
             $groupKey = $row['mastermodel'] . '-' . $row['size'];
@@ -3859,7 +3859,7 @@ class ExcelController extends BaseController
             ];
         }
 
-        // ✅ 3. Ambil total produksi untuk semua grup (1x query)
+        // ? 3. Ambil total produksi untuk semua grup (1x query)
         $produksiRows = $this->produksiModel->getTotalProduksiGroup($area);
 
         // mapping hasil produksi ke array model-size
@@ -3870,7 +3870,7 @@ class ExcelController extends BaseController
 
         // dd($mapProduksi);
 
-        // ✅ 4. Ambil total BS untuk semua idaps sekaligus (1x query)
+        // ? 4. Ambil total BS untuk semua idaps sekaligus (1x query)
         $bsRows = $this->bsModel->getTotalBsGroup($area);
 
         // hitung total bs per grup model-size
@@ -3879,7 +3879,7 @@ class ExcelController extends BaseController
             $mapBs[$b['model'] . '-' . $b['size']] = $b['total_bs'];
         }
 
-        // ✅ 5. Ambil total tambahan packing
+        // ? 5. Ambil total tambahan packing
         $bsRows = $this->ApsPerstyleModel->getPoPlusPacking($area);
 
         // hitung total po plus per grup model-size
@@ -3890,7 +3890,7 @@ class ExcelController extends BaseController
         // dd($mapPoPlus);
 
 
-        // ✅ 6. Gabungkan ke data utama, tampilkan hanya 1x per grup
+        // ? 6. Gabungkan ke data utama, tampilkan hanya 1x per grup
         $seen = [];
         foreach ($data as &$id) {
             $groupKey = $id['mastermodel'] . '-' . $id['size'];
@@ -4164,7 +4164,7 @@ class ExcelController extends BaseController
                     'lot_retur' => $retur['lot_retur']
                 ];
             } else {
-                // Jika ada lebih dari 1 retur untuk kombinasi yang sama → tambahkan nilainya
+                // Jika ada lebih dari 1 retur untuk kombinasi yang sama ? tambahkan nilainya
                 $returIndex[$key]['kgs_retur'] += (float)$retur['kgs_retur'];
                 $returIndex[$key]['cns_retur'] += (float)$retur['cns_retur'];
                 $returIndex[$key]['krg_retur'] += (float)$retur['krg_retur'];
@@ -4209,7 +4209,7 @@ class ExcelController extends BaseController
             $noModel = $row['no_model'];
             $style   = $row['style_size'];
 
-            // 🔑 ambil qty berdasarkan model + size
+            // ?? ambil qty berdasarkan model + size
             $qty_order = $qtyOrderList[$noModel][$style] ?? 0;
 
             $composition = (float) ($row['composition'] ?? 0);
@@ -4784,7 +4784,7 @@ class ExcelController extends BaseController
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
 
-        // Terapkan style ke seluruh area header (baris 8–10)
+        // Terapkan style ke seluruh area header (baris 8�10)
         $sheet->getStyle('A8:AD10')->applyFromArray($styleHeader);
         // Border kiri double untuk kolom A pada header
         $sheet->getStyle('A8:A10')->applyFromArray([
@@ -4854,7 +4854,7 @@ class ExcelController extends BaseController
             $persenPoplus  = ($kg_po > 0) ? round(($tambahanMcKg / $kg_po) * 100, 2) . '%' : '0%';
             $persenPlusPck = ($kg_po > 0) ? round(($tambahanPckKg / $kg_po) * 100, 2) . '%' : '0%';
 
-            // 🚨 Cek apakah sudah ganti no_model, item_type, atau kode_warna
+            // ?? Cek apakah sudah ganti no_model, item_type, atau kode_warna
             if ($prevModel !== null && ($currentModel !== $prevModel || $currentKode !== $prevKode || $currentItem !== $prevItemType)) {
                 $sheet->mergeCells("AD{$groupStartRow}:AD" . ($rowNum - 1));
 
@@ -4886,8 +4886,8 @@ class ExcelController extends BaseController
                     ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
                 $sheet->getRowDimension($rowNum)->setRowHeight(20);
-                // 🎯 Tambahin cek nilai kolom L–S di baris TOTAL
-                $columns = range('L', 'Z'); // L–Z
+                // ?? Tambahin cek nilai kolom L�S di baris TOTAL
+                $columns = range('L', 'Z'); // L�Z
                 $columns = array_merge($columns, ['AA', 'AB', 'AC']); // tambah kolom > Z
 
                 foreach ($columns as $col) {
@@ -4952,8 +4952,8 @@ class ExcelController extends BaseController
                 $row['ket_area'],
             ], null, 'A' . $rowNum);
 
-            // 🎯 Loop cek kolom L sampai S (ASCII 76 = L, 83 = S)
-            $columns = range('L', 'Z'); // L–Z
+            // ?? Loop cek kolom L sampai S (ASCII 76 = L, 83 = S)
+            $columns = range('L', 'Z'); // L�Z
             $columns = array_merge($columns, ['AA', 'AB', 'AC']); // tambah kolom > Z
 
             foreach ($columns as $col) {
@@ -4991,7 +4991,7 @@ class ExcelController extends BaseController
 
             $rowNum++;
         }
-        // ✅ Merge grup terakhir
+        // ? Merge grup terakhir
         $sheet->mergeCells("AD{$groupStartRow}:AD" . ($rowNum - 1));
 
         $lastRow = $rowNum - 1;
@@ -5019,7 +5019,7 @@ class ExcelController extends BaseController
         $contentLastRow = $rowNum - 1; // baris terakhir yang terisi saat loop selesai
 
         $sheet->mergeCells("A{$rowNum}:B{$rowNum}");
-        // 🚨 Setelah looping selesai, jangan lupa subtotal terakhir
+        // ?? Setelah looping selesai, jangan lupa subtotal terakhir
         if ($totalKgPo > 0) {
             // $sheet->mergeCells("I{$rowNum}:J{$rowNum}");
             // $sheet->setCellValue("I{$rowNum}", "TOTAL");
@@ -5057,8 +5057,8 @@ class ExcelController extends BaseController
                 ],
             ]);
             $sheet->getRowDimension($rowNum)->setRowHeight(20);
-            // 🎯 Tambahin cek nilai kolom L–S di baris TOTAL
-            $columns = range('L', 'Z'); // L–Z
+            // ?? Tambahin cek nilai kolom L�S di baris TOTAL
+            $columns = range('L', 'Z'); // L�Z
             $columns = array_merge($columns, ['AA', 'AB', 'AC']); // tambah kolom > Z
 
             foreach ($columns as $col) {
@@ -5987,7 +5987,7 @@ class ExcelController extends BaseController
         // un-reference
         unset($dates);
 
-        // 3. Buat mapping delivery → nomor urut
+        // 3. Buat mapping delivery ? nomor urut
         $deliveryIndexMap = [];
         foreach ($deliveryOrderMap as $no_model => $dates) {
             foreach ($dates as $i => $date) {
@@ -6448,7 +6448,7 @@ class ExcelController extends BaseController
         $sheet->mergeCells("{$colColor}2:{$colColor}3");
         // $sheet->getColumnDimension($colColor)->setAutoSize(true);
 
-        // ✅ APPLY $styleHeader ke seluruh header dari A2 sampai kolom terakhir
+        // ? APPLY $styleHeader ke seluruh header dari A2 sampai kolom terakhir
         $lastHeaderCol = $colColor;
         $sheet->getStyle("A2:{$lastHeaderCol}3")->applyFromArray($styleHeader);
 
@@ -7281,7 +7281,7 @@ class ExcelController extends BaseController
     //         ->setHorizontal(Alignment::HORIZONTAL_CENTER)
     //         ->setVertical(Alignment::VERTICAL_CENTER);
 
-    //     // Terapkan style ke seluruh area header (baris 8–10)
+    //     // Terapkan style ke seluruh area header (baris 8�10)
     //     $sheet->getStyle('A8:AD10')->applyFromArray($styleHeader);
     //     // Border kiri double untuk kolom A pada header
     //     $sheet->getStyle('A8:A10')->applyFromArray([
@@ -8010,7 +8010,7 @@ class ExcelController extends BaseController
                     $rowNum += 2; // jarak sedikit
                     $this->renderHeaderFormRetur($sheet, $area, $tglBuat, $delivery, $dataReturGrouped, $$styleHeader);
 
-                    $rowNum = 11; // header form kamu mengisi baris 1–10
+                    $rowNum = 11; // header form kamu mengisi baris 1�10
                     $currentPageRowCount = 0;
                 }
 
@@ -8052,7 +8052,7 @@ class ExcelController extends BaseController
                     '', // AD
                 ], null, 'A' . $rowNum);
 
-                // 🔹 Merge kolom A dan B
+                // ?? Merge kolom A dan B
                 $sheet->mergeCells("A{$rowNum}:B{$rowNum}");
 
                 $sheet->getRowDimension($rowNum)->setRowHeight(-1);
@@ -8122,7 +8122,7 @@ class ExcelController extends BaseController
                 '', // AD
             ], null, 'A' . $rowNum);
 
-            // 🔹 Merge kolom A dan B untuk baris subtotal
+            // ?? Merge kolom A dan B untuk baris subtotal
             $sheet->mergeCells("A{$rowNum}:B{$rowNum}");
 
             // Styling total
@@ -8151,7 +8151,7 @@ class ExcelController extends BaseController
                 'KG, BS ST= ' . round($total_bs_setting_dz, 2) .
                 'DZ / ' . round($total_bs_setting_kg, 2) . 'KG)';
 
-            // 🔹 Tambahkan data lot retur (kalau ada)
+            // ?? Tambahkan data lot retur (kalau ada)
             if (!empty($group['detail_lot'])) {
                 $lotDetailsText = [];
                 foreach ($group['detail_lot'] as $lot) {
@@ -8279,10 +8279,10 @@ class ExcelController extends BaseController
             ->setVertical(Alignment::VERTICAL_CENTER);
 
         //Outline Border
-        // 🩶 Hitung batas data terakhir
+        // ?? Hitung batas data terakhir
         $lastTT = $startTT + 4; // baris terakhir dari data kamu
 
-        // 🩶 Terapkan double border hanya di sisi luar (sesuai margin)
+        // ?? Terapkan double border hanya di sisi luar (sesuai margin)
         $borderStyleOuter = [
             'borders' => [
                 'outline' => [
@@ -8298,7 +8298,7 @@ class ExcelController extends BaseController
             $sheet->getRowDimension($r)->setRowHeight(20);
         }
 
-        // Terapkan border luar — sesuai margin (atas: 1, bawah: lastRow)
+        // Terapkan border luar � sesuai margin (atas: 1, bawah: lastRow)
 
         $sheet->getStyle("A11:AD{$lastTT}")->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
@@ -8649,7 +8649,7 @@ class ExcelController extends BaseController
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
 
-        // Terapkan style ke seluruh area header (baris 8–10)
+        // Terapkan style ke seluruh area header (baris 8�10)
         $sheet->getStyle('A8:AD10')->applyFromArray($styleHeader);
         // Border kiri double untuk kolom A pada header
         $sheet->getStyle('A8:A10')->applyFromArray([
@@ -8675,51 +8675,139 @@ class ExcelController extends BaseController
 
     public function exportDatangBenang()
     {
-        $key = $this->request->getGet('key');
-        $tanggalAwal = $this->request->getGet('tanggal_awal');
+        $key          = $this->request->getGet('key');
+        $tanggalAwal  = $this->request->getGet('tanggal_awal');
         $tanggalAkhir = $this->request->getGet('tanggal_akhir');
-        $poPlus = $this->request->getGet('po_plus');
+        $poPlus       = $this->request->getGet('po_plus');
 
-        $apiUrl = api_url('material') . 'filterDatangBenang?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir . '&po_plus=' . $poPlus;
+        $apiUrl = api_url('material') . 'filterDatangBenang' . '?key=' . urlencode($key) . '&tanggal_awal=' . $tanggalAwal . '&tanggal_akhir=' . $tanggalAkhir . '&po_plus=' . $poPlus;
 
-        $material = @file_get_contents($apiUrl);
+        $response = @file_get_contents($apiUrl);
+        $data = $response ? json_decode($response, true) : [];
 
-        // $models = [];
-        if ($material !== FALSE) {
-            $data = json_decode($material, true);
+        if (empty($data)) {
+            return;
         }
 
-        // $data = $this->pemasukanModel->getFilterDatangBenang($key, $tanggal_awal, $tanggal_akhir);
+        $noModels = array_unique(array_column($data, 'no_model'));
+        $qtyPcsRaw = $this->ApsPerstyleModel->getQtyOrderByNoModel($noModels);
+
+        $sumQtyBySize = [];
+        foreach ($qtyPcsRaw as $row) {
+            $model = $row['mastermodel'];
+            $size  = $row['size'];
+            $qty   = (int) $row['qty'];
+
+            $sumQtyBySize[$model][$size] =
+                ($sumQtyBySize[$model][$size] ?? 0) + $qty;
+        }
+
+        $styleKeyMap = [];
+
+        foreach ($data as $dt) {
+            $keyStyle = implode('|', [
+                $dt['no_model'],
+                $dt['item_type'],
+                $dt['kode_warna'],
+                $dt['warna']
+            ]);
+
+            if (!isset($styleKeyMap[$keyStyle])) {
+                $styleKeyMap[$keyStyle] = [
+                    'no_model'   => $dt['no_model'],
+                    'item_type'  => $dt['item_type'],
+                    'kode_warna' => $dt['kode_warna'],
+                    'warna'      => $dt['warna'],
+                ];
+            }
+        }
+
+        $styleMap = [];
+
+        foreach ($styleKeyMap as $keyStyle => $param) {
+            $styleUrl = api_url('material') . 'getStyleSizeByBb'
+                . '?no_model=' . urlencode($param['no_model'])
+                . '&item_type=' . urlencode($param['item_type'])
+                . '&kode_warna=' . urlencode($param['kode_warna'])
+                . '&warna=' . urlencode($param['warna']);
+
+            $styleResponse = @file_get_contents($styleUrl);
+            $styleMap[$keyStyle] = $styleResponse ? json_decode($styleResponse, true) : [];
+        }
+
+        foreach ($data as $i => $dt) {
+
+            $keyStyle = implode('|', [
+                $dt['no_model'],
+                $dt['item_type'],
+                $dt['kode_warna'],
+                $dt['warna']
+            ]);
+
+            $styles = $styleMap[$keyStyle] ?? [];
+
+            $ttlKgs = 0;
+
+            foreach ($styles as $style) {
+
+                $styleSize = $style['style_size'];
+                $qty = $sumQtyBySize[$dt['no_model']][$styleSize] ?? 0;
+
+                if ($qty <= 0) {
+                    continue;
+                }
+
+                if (
+                    isset($style['item_type'])
+                    && stripos($style['item_type'], 'JHT') !== false
+                ) {
+                    $kebutuhan = (float) ($style['kgs'] ?? 0);
+                } else {
+                    $kebutuhan = (
+                        ($qty * $style['gw'] * $style['composition'] / 100 / 1000)
+                        * (1 + ($style['loss'] / 100))
+                    );
+                }
+
+                $ttlKgs += $kebutuhan;
+            }
+
+            $data[$i]['kgs_material'] = round($ttlKgs, 2);
+        }
+
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Judul
         $sheet->setCellValue('A1', 'Datang Benang');
-        $sheet->mergeCells('A1:V1'); // Menggabungkan sel untuk judul
+        $sheet->mergeCells('A1:Y1');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-        // Header
-        $header = ["No", "Foll Up", "No Model", "No Order", "Buyer", "Delivery Awal", "Delivery Akhir", "Order Type", "Item Type", "Kode Warna", "Warna", "KG Pesan", "Tanggal Datang", "Kgs Datang", "Cones Datang", "LOT Datang", "No Surat Jalan", "LMD", "GW", "Harga", "Nama Cluster", "Po Tambahan"];
-        $sheet->fromArray([$header], NULL, 'A3');
-
         // Styling Header
-        $sheet->getStyle('A3:V3')->getFont()->setBold(true);
-        $sheet->getStyle('A3:V3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A3:V3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A3:Y3')->getFont()->setBold(true);
+        $sheet->getStyle('A3:Y3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A3:Y3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
-        // Data
+        $header = ["No", "Foll Up", "No Model", "No Order", "Buyer", "Delivery Awal", "Delivery Akhir", "Order Type", "Item Type", "Kode Warna", "Warna", "KG Pesan", "Tanggal Datang", "Kgs Datang", "Cones Datang", "LOT Datang", "No Surat Jalan", "LMD", "GW", "Harga", "Nama Cluster", "PO Tambahan", "Ganti Retur", "Waktu Input", "Admin"];
+
+        $sheet->fromArray([$header], null, 'A3');
+
         $row = 4;
-        foreach ($data as $index => $item) {
+        foreach ($data as $i => $item) {
             $getPoPlus = $item['po_plus'];
+            $getGantiRetur = $item['ganti_retur'];
             if ($getPoPlus == 1) {
                 $poPlus = 'YA';
             } else {
                 $poPlus = '';
             }
+            if ($getGantiRetur == 1) {
+                $gantiRetur = 'YA';
+            } else {
+                $gantiRetur = '';
+            }
             $sheet->fromArray([
                 [
-                    $index + 1,
+                    $i + 1,
                     $item['foll_up'],
                     $item['no_model'],
                     $item['no_order'],
@@ -8741,6 +8829,9 @@ class ExcelController extends BaseController
                     number_format($item['harga'], 2),
                     $item['nama_cluster'],
                     $poPlus,
+                    $gantiRetur,
+                    $item['created_at'],
+                    $item['admin']
                 ]
             ], NULL, 'A' . $row);
             $row++;
@@ -8755,16 +8846,16 @@ class ExcelController extends BaseController
                 ],
             ],
         ];
-        $sheet->getStyle('A3:V' . ($row - 1))->applyFromArray($styleArray);
+        $sheet->getStyle('A3:Y' . ($row - 1))->applyFromArray($styleArray);
 
         // Set auto width untuk setiap kolom
-        foreach (range('A', 'V') as $column) {
+        foreach (range('A', 'Y') as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 
         // Set isi tabel agar rata tengah
-        $sheet->getStyle('A4:V' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A4:V' . ($row - 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A4:Y' . ($row - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A4:Y' . ($row - 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
         $writer = new Xlsx($spreadsheet);
         $fileName = 'Report_Datang_Benang_' . date('Y-m-d') . '.xlsx';
@@ -8776,6 +8867,7 @@ class ExcelController extends BaseController
         $writer->save('php://output');
         exit;
     }
+
     public function exportPoBenang()
     {
         $key = $this->request->getGet('key');
@@ -9021,7 +9113,7 @@ class ExcelController extends BaseController
                     ],
                 ]);
 
-            // Auto–size kolom
+            // Auto�size kolom
             foreach (range('A', 'X') as $c) {
                 $sheet->getColumnDimension($c)->setAutoSize(true);
             }
@@ -10491,7 +10583,7 @@ class ExcelController extends BaseController
             if (empty($bulan) || !preg_match('/^\d{4}\-\d{2}$/', $bulan)) {
                 return $this->response
                     ->setStatusCode(400)
-                    ->setJSON(['error' => 'Parameter “bulan” harus dalam format YYYY-MM']);
+                    ->setJSON(['error' => 'Parameter �bulan� harus dalam format YYYY-MM']);
             }
 
             $timestamp     = strtotime($bulan . '-01');
@@ -12062,7 +12154,7 @@ class ExcelController extends BaseController
     //         $dataSmv = $this->ApsPerstyleModel->getDataSmv($masterModels, $sizes);
     //     }
 
-    //     // 1️⃣ Kelompokkan SMV per mastermodel + machinetypeid
+    //     // 1?? Kelompokkan SMV per mastermodel + machinetypeid
     //     $smvPerMachineModel = [];
     //     foreach ($dataSmv as $row) {
     //         $key = $row['mastermodel'] . '|' . $row['machinetypeid'];
@@ -12071,13 +12163,13 @@ class ExcelController extends BaseController
     //         }
     //     }
 
-    //     // 2️⃣ Hitung rata-rata SMV per kombinasi mastermodel|machinetypeid
+    //     // 2?? Hitung rata-rata SMV per kombinasi mastermodel|machinetypeid
     //     $avgSmvPerMachineModel = [];
     //     foreach ($smvPerMachineModel as $key => $values) {
     //         $avgSmvPerMachineModel[$key] = array_sum($values) / count($values);
     //     }
 
-    //     // 3️⃣ Hitung jumlah mesin unik per mastermodel|machinetypeid dari data produksi
+    //     // 3?? Hitung jumlah mesin unik per mastermodel|machinetypeid dari data produksi
     //     $machineCount = [];
     //     foreach ($dataProduksi as $row) {
     //         $key = $row['mastermodel'] . '|' . $row['machinetypeid'];
@@ -12092,7 +12184,7 @@ class ExcelController extends BaseController
     //         $machineCount[$key] = count($listMesin);
     //     }
 
-    //     // 4️⃣ Hitung target final
+    //     // 4?? Hitung target final
     //     $finalTarget = [];
     //     foreach ($avgSmvPerMachineModel as $key => $avgSmv) {
     //         // rumus target dasar: (86400 / smv) * 0.85 / 24
@@ -12106,8 +12198,8 @@ class ExcelController extends BaseController
     //         $finalTarget[$key] = $targetPerMachine * $countMesin;
     //     }
 
-    //     // 5️⃣ DATA TOTAL PER JARUM (MACHINE TYPE) → PER MASTER MODEL
-    //     // ===================== DATA TOTAL PER JARUM (MACHINE TYPE) → PER MASTER MODEL ======================
+    //     // 5?? DATA TOTAL PER JARUM (MACHINE TYPE) ? PER MASTER MODEL
+    //     // ===================== DATA TOTAL PER JARUM (MACHINE TYPE) ? PER MASTER MODEL ======================
     //     $dataPerJarumPerModel = [];
 
     //     // Loop data produksi
@@ -12287,7 +12379,7 @@ class ExcelController extends BaseController
     //             ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
     //     };
 
-    //     // 🆕 Tambahkan untuk menyimpan posisi semua no_mesin
+    //     // ?? Tambahkan untuk menyimpan posisi semua no_mesin
     //     $noMesinMap = [];
 
     //     // ================ START ISI DATA PER MODEL ================
@@ -12369,7 +12461,7 @@ class ExcelController extends BaseController
     //             $sheet->setCellValue(chr(ord($colStart) + 6) . $rowNow, $item['qty_produksi']);
     //             $sheet->getRowDimension($rowNow)->setRowHeight(29);
 
-    //             // 🆕 Catat posisi cell "NO MC"
+    //             // ?? Catat posisi cell "NO MC"
     //             $noMcValue = $item['no_mesin'];
     //             if (!isset($noMesinMap[$noMcValue])) {
     //                 $noMesinMap[$noMcValue] = [];
@@ -12505,7 +12597,7 @@ class ExcelController extends BaseController
     //         }
     //     }
 
-    //     // 🆕 Setelah semua data ditulis, buat border miring untuk no_mesin yang sama
+    //     // ?? Setelah semua data ditulis, buat border miring untuk no_mesin yang sama
     //     foreach ($noMesinMap as $noMc => $cells) {
     //         if (count($cells) > 1 && !empty($noMc)) {
     //             foreach ($cells as $cell) {
@@ -12771,7 +12863,7 @@ class ExcelController extends BaseController
             $dataSmv = $this->ApsPerstyleModel->getDataSmv($masterModels, $sizes);
         }
 
-        // 1️⃣ Kelompokkan SMV per mastermodel + machinetypeid
+        // 1?? Kelompokkan SMV per mastermodel + machinetypeid
         $smvPerMachineModel = [];
         foreach ($dataSmv as $row) {
             $key = $row['mastermodel'] . '|' . $row['machinetypeid'];
@@ -12780,13 +12872,13 @@ class ExcelController extends BaseController
             }
         }
 
-        // 2️⃣ Hitung rata-rata SMV per kombinasi mastermodel|machinetypeid
+        // 2?? Hitung rata-rata SMV per kombinasi mastermodel|machinetypeid
         $avgSmvPerMachineModel = [];
         foreach ($smvPerMachineModel as $key => $values) {
             $avgSmvPerMachineModel[$key] = array_sum($values) / count($values);
         }
 
-        // 3️⃣ Hitung jumlah mesin unik per mastermodel|machinetypeid dari data produksi
+        // 3?? Hitung jumlah mesin unik per mastermodel|machinetypeid dari data produksi
         $machineCount = [];
         foreach ($dataProduksi as $row) {
             $key = $row['mastermodel'] . '|' . $row['machinetypeid'];
@@ -12801,7 +12893,7 @@ class ExcelController extends BaseController
             $machineCount[$key] = count($listMesin);
         }
 
-        // 4️⃣ Hitung target final
+        // 4?? Hitung target final
         $finalTarget = [];
         foreach ($avgSmvPerMachineModel as $key => $avgSmv) {
             // rumus target dasar: (86400 / smv) * 0.85 / 24
@@ -12815,8 +12907,8 @@ class ExcelController extends BaseController
             $finalTarget[$key] = $targetPerMachine * $countMesin;
         }
 
-        // 5️⃣ DATA TOTAL PER JARUM (MACHINE TYPE) → PER MASTER MODEL
-        // ===================== DATA TOTAL PER JARUM (MACHINE TYPE) → PER MASTER MODEL ======================
+        // 5?? DATA TOTAL PER JARUM (MACHINE TYPE) ? PER MASTER MODEL
+        // ===================== DATA TOTAL PER JARUM (MACHINE TYPE) ? PER MASTER MODEL ======================
         $dataPerJarumPerModel = [];
 
         // Loop data produksi
@@ -12989,7 +13081,7 @@ class ExcelController extends BaseController
                 ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
         };
 
-        // 🆕 Tambahkan untuk menyimpan posisi semua no_mesin
+        // ?? Tambahkan untuk menyimpan posisi semua no_mesin
         $noMesinMap = [];
 
         // ================ START ISI DATA PER MODEL (1 BLOK SAJA) ================
@@ -13142,10 +13234,10 @@ class ExcelController extends BaseController
             $rowInBlock++;
         }
 
-        // 🆕 Setelah semua data ditulis, buat border miring untuk no_mesin yang sama
+        // ?? Setelah semua data ditulis, buat border miring untuk no_mesin yang sama
         foreach ($noMesinMap as $key => $cells) {
 
-            // Jika baris lebih dari 1 untuk kombinasi yang sama → beri garis miring
+            // Jika baris lebih dari 1 untuk kombinasi yang sama ? beri garis miring
             if (count($cells) > 1) {
 
                 foreach ($cells as $cell) {
@@ -13453,7 +13545,7 @@ class ExcelController extends BaseController
                 $sheet->setCellValue("T{$row}",  $this->formatDate($pps['acc_fu'] ?? null));
                 $sheet->setCellValue("U{$row}", $pps['history'] ?? '');
 
-                // 🟩 Highlighting logic
+                // ?? Highlighting logic
                 if (strtolower($pps['material_status'] ?? '') === 'complete') {
                     $sheet->getStyle("H{$row}")->getFill()
                         ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
@@ -13722,7 +13814,7 @@ class ExcelController extends BaseController
             $sheet->setCellValue('C' . $row, $item['color'] ?? '');
             $sheet->setCellValue('D' . $row, $item['jenis'] ?? '');
 
-            // qty_po, kg_celup, kg_stock, total_po_tambahan → numeric 2 desimal
+            // qty_po, kg_celup, kg_stock, total_po_tambahan ? numeric 2 desimal
             $sheet->setCellValue('E' . $row, (float) ($item['qty_po'] ?? 0));
             $sheet->setCellValue('F' . $row, (float) ($item['total_po_tambahan'] ?? 0));
             $sheet->setCellValue('G' . $row, (float) ($item['kg_celup'] ?? 0));
@@ -13807,7 +13899,7 @@ class ExcelController extends BaseController
         unset($upper); // good practice
 
 
-        // 1️⃣ GROUP BY AREA, KODE DEFFECT, DAN TANGGAL
+        // 1?? GROUP BY AREA, KODE DEFFECT, DAN TANGGAL
         $groupedData = [];
 
         // Loop data mentah
@@ -13846,7 +13938,7 @@ class ExcelController extends BaseController
         }
         unset($kodeList); // hapus referensi
 
-        // 2️⃣ KUMPULKAN SEMUA TANGGAL UNIK (buat header tabel nanti)
+        // 2?? KUMPULKAN SEMUA TANGGAL UNIK (buat header tabel nanti)
         $tanggalList = [];
         foreach ($getData as $row) {
             $tanggalList[$row['tgl_perbaikan']] = true;
@@ -14142,7 +14234,7 @@ class ExcelController extends BaseController
                 $labelRange,                            // kategori = tanggal (vertikal)
                 $valueRange                             // nilai = qty (horizontal)
             );
-            $seriesBar->setPlotDirection(DataSeries::DIRECTION_COL); // horizontal bar ✅
+            $seriesBar->setPlotDirection(DataSeries::DIRECTION_COL); // horizontal bar ?
 
             // === LINE CHART untuk rata-rata ===
             $valueAvgRange = [
@@ -14223,7 +14315,7 @@ class ExcelController extends BaseController
         // dd($getData);
 
         $groupedDataTotal = [];
-        // 1️⃣ Hitung total qty per area
+        // 1?? Hitung total qty per area
         foreach ($getData as $row) {
             $area = $row['area'];
             $qty  = (int)$row['qty'];
@@ -14239,7 +14331,7 @@ class ExcelController extends BaseController
             $groupedDataTotal[$area]['total_bs'] += $qty;
         }
 
-        // 2️⃣ Gabungkan data jlmc ke dalam hasil
+        // 2?? Gabungkan data jlmc ke dalam hasil
         foreach ($getJlmc as $row) {
             $area = $row['area'];
             $jlmc    = (int)($row['total_mc'] ?? 0);
@@ -14257,7 +14349,7 @@ class ExcelController extends BaseController
             $groupedDataTotal[$area]['avg_mesin'] = $jlmc > 0 ? round($jlmc / $jumlahHari) : 0;
             $groupedDataTotal[$area]['total_produksi'] = $qtyProd > 0 ? round($qtyProd / 24) : 0; // jumlah mc dibagi total hari = rata rata jl mc
         }
-        // 3️⃣ Hitung turunan tambahan
+        // 3?? Hitung turunan tambahan
         foreach ($groupedDataTotal as $area => &$val) {
             $totalBs       = $val['total_bs'];
             $totalMc       = $val['avg_mesin'];
@@ -14280,7 +14372,7 @@ class ExcelController extends BaseController
         // Urutkan berdasarkan nama area (key)
         ksort($groupedDataTotal);
 
-        // 4️⃣ Hitung rata-rata keseluruhan
+        // 4?? Hitung rata-rata keseluruhan
         $totalArea = 0;
         $totalAvgByMesin = 0;
         $totalAvgByMcDay = 0;
@@ -14733,7 +14825,7 @@ class ExcelController extends BaseController
         }
         unset($upper); // good practice
 
-        // 1️⃣ GROUP BY AREA, KODE DEFFECT, DAN TANGGAL
+        // 1?? GROUP BY AREA, KODE DEFFECT, DAN TANGGAL
         $groupedData = [];
 
         // Loop data mentah
@@ -14772,7 +14864,7 @@ class ExcelController extends BaseController
         }
         unset($kodeList); // hapus referensi
 
-        // 2️⃣ KUMPULKAN SEMUA TANGGAL UNIK (buat header tabel nanti)
+        // 2?? KUMPULKAN SEMUA TANGGAL UNIK (buat header tabel nanti)
         $tanggalList = [];
         foreach ($getData as $row) {
             $tanggalList[$row['tgl_instocklot']] = true;
@@ -15072,7 +15164,7 @@ class ExcelController extends BaseController
                 $labelRange,                            // kategori = tanggal (vertikal)
                 $valueRange                             // nilai = qty (horizontal)
             );
-            $seriesBar->setPlotDirection(DataSeries::DIRECTION_COL); // horizontal bar ✅
+            $seriesBar->setPlotDirection(DataSeries::DIRECTION_COL); // horizontal bar ?
 
             // === LINE CHART untuk rata-rata ===
             $valueAvgRange = [
@@ -15110,7 +15202,7 @@ class ExcelController extends BaseController
                 $plotArea
             );
 
-            // Posisi chart di kiri (A–E)
+            // Posisi chart di kiri (A�E)
             $chart->setTopLeftPosition('A' . ($barStart + 1));
             $chart->setBottomRightPosition('E' . ($barStart + 25));
 
@@ -15162,7 +15254,7 @@ class ExcelController extends BaseController
         // dd($getData);
 
         $groupedDataTotal = [];
-        // 1️⃣ Hitung total qty per area
+        // 1?? Hitung total qty per area
         foreach ($getData as $row) {
             $area = $row['area'];
             $qty  = (int)$row['qty'];
@@ -15178,7 +15270,7 @@ class ExcelController extends BaseController
             $groupedDataTotal[$area]['total_bs'] += $qty;
         }
 
-        // 2️⃣ Gabungkan data jlmc ke dalam hasil
+        // 2?? Gabungkan data jlmc ke dalam hasil
         foreach ($getJlmc as $row) {
             $area = $row['area'];
             $jlmc    = (int)($row['total_mc'] ?? 0);
@@ -15196,7 +15288,7 @@ class ExcelController extends BaseController
             $groupedDataTotal[$area]['avg_mesin'] = $jlmc > 0 ? round($jlmc / $jumlahHari) : 0;
             $groupedDataTotal[$area]['total_produksi'] = $qtyProd > 0 ? round($qtyProd / 24) : 0; // jumlah mc dibagi total hari = rata rata jl mc
         }
-        // 3️⃣ Hitung turunan tambahan
+        // 3?? Hitung turunan tambahan
         foreach ($groupedDataTotal as $area => &$val) {
             $totalBs       = $val['total_bs'];
             $totalMc       = $val['avg_mesin'];
@@ -15219,7 +15311,7 @@ class ExcelController extends BaseController
         // Urutkan berdasarkan nama area (key)
         ksort($groupedDataTotal);
 
-        // 4️⃣ Hitung rata-rata keseluruhan
+        // 4?? Hitung rata-rata keseluruhan
         $totalArea = 0;
         $totalAvgByMesin = 0;
         $totalAvgByMcDay = 0;
@@ -15649,13 +15741,13 @@ class ExcelController extends BaseController
         // Siapkan default grouped kosong
         $grouped = [];
 
-        // Jika no_model kosong → skip proses tapi tetap kirim view
+        // Jika no_model kosong ? skip proses tapi tetap kirim view
         if (!empty($no_model)) {
 
             // data utama
             $allData = $this->ApsPerstyleModel->geQtyByModel($no_model);
 
-            // Jika data utama ada → proses
+            // Jika data utama ada ? proses
             if (!empty($allData)) {
 
                 // Siapkan array mapping
@@ -15939,6 +16031,110 @@ class ExcelController extends BaseController
         header('Cache-Control: max-age=0');
 
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function exportHistorySpk()
+    {
+        $request = service('request');
+
+        $filters = [
+            'tgl'      => $request->getGet('tgl'),
+            'no_model' => $request->getGet('no_model'),
+            'style'    => $request->getGet('style'),
+        ];
+
+        $data = $this->estspk->getHistorySpkExport($filters);
+
+        // start excel
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Title
+        $sheet->setCellValue('A1', "History SPK");
+        $sheet->mergeCells('A1:H1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'size' => 14,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+        ]);
+
+        $headers = [
+            'A3' => 'Tanggal Approve',
+            'B3' => 'Jam',
+            'C3' => 'No Model',
+            'D3' => 'Style',
+            'E3' => 'Area',
+            'F3' => 'Qty',
+            'G3' => 'Status',
+            'H3' => 'Keterangan',
+        ];
+
+        foreach ($headers as $cell => $text) {
+            $sheet->setCellValue($cell, $text);
+        }
+        // Style header
+        $sheet->getStyle('A3:H3')->applyFromArray([
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+        ]);
+
+        $row = 4;
+
+        foreach ($data as $item) {
+            $sheet->setCellValue('A' . $row, $item['tgl_buat']);
+            $sheet->setCellValue('B' . $row, $item['jam']);
+            $sheet->setCellValue('C' . $row, $item['model']);
+            $sheet->setCellValue('D' . $row, $item['style']);
+            $sheet->setCellValue('E' . $row, $item['area']);
+            $sheet->setCellValue('F' . $row, $item['qty']);
+            $sheet->setCellValue('G' . $row, $item['status']);
+            $sheet->setCellValue('H' . $row, $item['keterangan']);
+            $row++;
+        }
+
+        // Border body
+        $sheet->getStyle('A3:H' . ($row - 1))->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+        ]);
+
+        // Auto width kolom
+        foreach (range('A', 'H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = 'History_SPK_' . date('Ymd_His') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
     }

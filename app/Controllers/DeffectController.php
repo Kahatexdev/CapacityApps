@@ -254,45 +254,74 @@ class DeffectController extends BaseController
 
     public function resetbsarea()
     {
-        $area = $this->request->getPost('area');
-        $awal = $this->request->getPost('awal');
+        $area  = $this->request->getPost('area') ?? null;
+        $awal  = $this->request->getPost('awal');
         $akhir = $this->request->getPost('akhir');
 
-        $idaps = $this->bsModel->getDataForReset($area, $awal, $akhir);
-        if (!empty($idaps)) {
-            // Memulai transaksi
-            $this->db->transBegin();
-
-            $failedIds = []; // Array untuk menyimpan ID yang gagal
-
-            foreach ($idaps as $data) {
-                $qtyBs = intval($data['qty']);
-                $idbs = $data['idbs'];
-                $id = $data['idapsperstyle'];
-                $dataOrder = $this->ApsPerstyleModel->getSisaOrder($id);
-                $newOrder = $dataOrder - $qtyBs;
-
-                $updateOrder = $this->ApsPerstyleModel->update($id, ['sisa' => $newOrder]);
-                $this->bsModel->delete($idbs);
-            }
-
-            if ($this->db->transStatus() === FALSE || !empty($failedIds)) {
-                // Rollback jika ada yang gagal
-                $this->db->transRollback();
-
-                // Menyusun pesan kesalahan
-                $errorMsg = 'Gagal melakukan reset pada ID: ' . implode(', ', $failedIds);
-                return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('error', $errorMsg);
-            } else {
-                // Commit transaksi jika semua sukses
-                $this->db->transCommit();
-                return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('success', 'Data Berhasil di-reset');
-            }
-        } else {
-            // Jika $idaps kosong
-            return redirect()->to(base_url(session()->get('role') . '/datadeffect'))->withInput()->with('error', 'Tidak ada data yang ditemukan untuk di-reset.');
+        $rows = $this->bsModel->getDataForReset($awal, $akhir, $area);
+        if (empty($rows)) {
+            return redirect()
+                ->to(base_url(session()->get('role') . '/datadeffect'))
+                ->with('error', 'Tidak ada data yang ditemukan untuk di-reset.');
         }
+
+        $db = $this->db;
+
+        // ===============================
+        // CONTAINER
+        // ===============================
+        $apsReduceMap = []; // idaps => totalQtyBS
+        $bsIds        = []; // idbs list
+
+        foreach ($rows as $row) {
+            $idAps = (int) $row['idapsperstyle'];
+            $qty   = (int) $row['qty'];
+
+            $apsReduceMap[$idAps] = ($apsReduceMap[$idAps] ?? 0) + $qty;
+            $bsIds[] = (int) $row['idbs'];
+        }
+
+        if (empty($apsReduceMap) || empty($bsIds)) {
+            return redirect()
+                ->to(base_url(session()->get('role') . '/datadeffect'))
+                ->with('error', 'Data tidak valid untuk di-reset.');
+        }
+
+        $db->transStart();
+
+        /**
+         * UPDATE APS (per ID, tapi sudah teragregasi)
+         */
+        foreach ($apsReduceMap as $idAps => $totalQty) {
+            $this->ApsPerstyleModel
+                ->set('sisa', "sisa - {$totalQty}", false) // atomic
+                ->where('idapsperstyle', $idAps)
+                ->update();
+        }
+
+        /**
+         * DELETE BS (BATCH)
+         */
+        $this->bsModel
+            ->whereIn('idbs', $bsIds)
+            ->delete();
+
+        $db->transComplete();
+
+        // ===============================
+        // TRANSACTION CHECK
+        // ===============================
+        if ($db->transStatus() === false) {
+            return redirect()
+                ->to(base_url(session()->get('role') . '/datadeffect'))
+                ->with('error', 'Gagal melakukan reset data BS.');
+        }
+
+        return redirect()
+            ->to(base_url(session()->get('role') . '/datadeffect'))
+            ->with('success', 'Data BS berhasil di-reset.');
     }
+
     public function getBsMesin()
     {
         $bulan = $this->request->getGet('bulan');
@@ -334,9 +363,110 @@ class DeffectController extends BaseController
             'area' => $area,
             'buyer' => $buyer,
         ];
-        $getData = $this->perbaikanModel->getDataPerbaikanFilter($theData);
+        $databs = $this->perbaikanModel->getDataPerbaikanFilter($theData);
         $total = $this->perbaikanModel->totalPerbaikan($theData);
         $chartData = $this->perbaikanModel->chartData($theData);
+        $chartTop10 = array_slice($chartData, 0, 10);
+
+        // filter bulan sumamry global
+        $currentMonth = (int) date('n');
+        $currentYear  = (int) date('Y');
+
+        $namaBulan = [
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember'
+        ];
+
+        $bulanList = [];
+        for ($month = 1; $month <= 12; $month++) {
+            $bulanList[] = [
+                'value' => sprintf('%04d-%02d', $currentYear, $month), // contoh: 2025-01
+                'label' => $namaBulan[$month] . ' ' . $currentYear
+            ];
+        }
+
+        $getData = $this->perbaikanModel->getDataSummaryPerbaikan($theData);
+        $totalSum = [
+            'prod'  => 0,
+            'pb'    => 0,
+            'goodPb' => 0,
+            'stc'   => 0,
+            'stcPb' => 0,
+        ];
+
+        foreach ($getData as $row) {
+            $prod  = (float) ($row['prod']  ?? 0);
+            $pb    = (float) ($row['pb']    ?? 0);
+            $stc   = (float) ($row['stc']   ?? 0);
+            $stcPb = (float) ($row['stcPb'] ?? 0);
+
+            $totalSum['prod']   += $prod;
+            $totalSum['pb']     += $pb;
+            $totalSum['stc']    += $stc;
+            $totalSum['stcPb']  += $stcPb;
+            $totalSum['goodPb'] += ($pb - $stcPb);
+        }
+
+        $data = [
+            'role' => session()->get('role'),
+            'username' => session()->get('username'),
+            'title' => ' Data Perbaikan',
+            'active1' => '',
+            'active2' => '',
+            'active3' => '',
+            'active4' => '',
+            'active5' => '',
+            'active6' => '',
+            'active7' => '',
+            'kode' => $master,
+            'databs' => $databs,
+            'getData' => $getData,
+            'awal' => $awal,
+            'akhir' => $akhir,
+            'pdk' => $pdk,
+            'area' => $area,
+            'totalbs' => $total,
+            'chart' => $chartData,
+            'topTen' => $chartTop10,
+            'dataBuyer' => $dataBuyer,
+            'filter' => $theData,
+            'filterBulan' => $bulanList,
+            'total' => $totalSum,
+        ];
+        // dd($data);
+
+        return view(session()->get('role') . '/Perbaikan/tabelperbaikan', $data);
+    }
+    public function detailViewPerbaikan()
+    {
+        $master = $this->deffectModel->findAll();
+        $dataBuyer = $this->orderModel->getBuyer();
+
+        $awal = $this->request->getGet('awal') ?? '';
+        $akhir = $this->request->getGet('akhir') ?? '';
+        $pdk = $this->request->getGet('pdk') ?? '';
+        $area = $this->request->getGet('area') ?? '';
+        $buyer = $this->request->getGet('buyer') ?? '';
+        // dd($buyer);
+        $theData = [
+            'awal' => $awal,
+            'akhir' => $akhir,
+            'pdk' => $pdk,
+            'area' => $area,
+            'buyer' => $buyer,
+        ];
+        $databs = $this->perbaikanModel->getDataPerbaikanFilter($theData);
+        $total = $this->perbaikanModel->totalPerbaikan($theData);
 
         // filter bulan sumamry global
         $currentMonth = (int) date('n');
@@ -368,7 +498,7 @@ class DeffectController extends BaseController
         $data = [
             'role' => session()->get('role'),
             'username' => session()->get('username'),
-            'title' => ' Data Perbaikan',
+            'title' => ' Data Detail Perbaikan',
             'active1' => '',
             'active2' => '',
             'active3' => '',
@@ -377,19 +507,17 @@ class DeffectController extends BaseController
             'active6' => '',
             'active7' => '',
             'kode' => $master,
-            'databs' => $getData,
+            'databs' => $databs,
             'awal' => $awal,
             'akhir' => $akhir,
             'pdk' => $pdk,
             'area' => $area,
-            'totalbs' => $total,
-            'chart' => $chartData,
             'dataBuyer' => $dataBuyer,
             'filter' => $theData,
             'filterBulan' => $bulanList,
         ];
 
-        return view(session()->get('role') . '/Perbaikan/tabelperbaikan', $data);
+        return view(session()->get('role') . '/Perbaikan/tabelperbaikanDetail', $data);
     }
     public function summaryGlobalPbArea()
     {
