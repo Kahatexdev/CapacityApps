@@ -768,7 +768,7 @@ class GodController extends BaseController
         $client = service('curlrequest');
 
         $response = $client->get(
-            'http://172.23.39.117/ComplaintSystem/public/api/CS/user',
+            'http://172.23.44.16/ComplaintSystem/public/api/CS/user',
             [
                 'http_errors' => false, // 🔥 PENTING
             ]
@@ -823,7 +823,7 @@ class GodController extends BaseController
         $client = service('curlrequest');
 
         $response = $client->post(
-            'http://172.23.39.117/ComplaintSystem/public/api/userAdd',
+            'http://172.23.44.16/ComplaintSystem/public/api/userAdd',
             [
                 'http_errors' => false, // 🔥 PENTING
                 'form_params' => [
@@ -881,7 +881,7 @@ class GodController extends BaseController
         $client = service('curlrequest');
 
         $response = $client->post(
-            'http://172.23.39.117/ComplaintSystem/public/api/userDelete',
+            'http://172.23.44.16/ComplaintSystem/public/api/userDelete',
             [
                 'http_errors' => false, // 🔥 PENTING
                 'form_params' => [
@@ -923,7 +923,7 @@ class GodController extends BaseController
 
         try {
             $response = $client->post(
-                'http://172.23.39.117/ComplaintSystem/public/api/userUpdate',
+                'http://172.23.44.16/ComplaintSystem/public/api/userUpdate',
                 [
                     'http_errors' => false,
                     'form_params' => $payload,

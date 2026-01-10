@@ -17,7 +17,7 @@ class App extends BaseConfig
      * E.g., http://example.com/
      */
     // public $baseURL = 'http://localhost:8080/';
-    public $baseURL = 'http://172.23.39.117/CapacityApps/public/';
+    public $baseURL = 'http://172.23.44.16/CapacityApps/public/';
     public $complaintApiUrl;
     public $materialApiUrl;
     public $hrisApiUrl;
@@ -27,10 +27,10 @@ class App extends BaseConfig
     {
         parent::__construct();
 
-        $this->complaintApiUrl = getenv('COMPLAINT_API_URL') ?: 'http://172.23.39.117/ComplaintSystem/public/api/';
-        $this->materialApiUrl = getenv('MATERIAL_API_URL') ?: 'http://172.23.39.117/MaterialSystem/public/api/';
-        $this->hrisApiUrl = getenv('HRIS_API_URL') ?: 'http://172.23.39.117/HumanResourceSystem/public/api/';
-        $this->tlsApiUrl = getenv('TLS_API_URL') ?: 'http://172.23.39.117/KHTEXT/public/api/';
+        $this->complaintApiUrl = getenv('COMPLAINT_API_URL') ?: 'http://172.23.44.16/ComplaintSystem/public/api/';
+        $this->materialApiUrl = getenv('MATERIAL_API_URL') ?: 'http://172.23.44.16/MaterialSystem/public/api/';
+        $this->hrisApiUrl = getenv('HRIS_API_URL') ?: 'http://172.23.44.16/HumanResourceSystem/public/api/';
+        $this->tlsApiUrl = getenv('TLS_API_URL') ?: 'http://172.23.44.16/KHTEXT/public/api/';
     }
 
     /**

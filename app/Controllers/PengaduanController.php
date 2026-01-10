@@ -36,8 +36,13 @@ class PengaduanController extends BaseController
             $threads = json_decode($json, true);
             $roles = json_decode($jsonRole, true);
             if (!is_array($threads)) {
-                throw new \Exception('Format response API tidak valid');
+                throw new \Exception('Format response thread tidak valid');
             }
+
+            if (!is_array($roles) || !isset($roles['data'])) {
+                $roles = ['data' => []];
+            }
+
             return view($role . '/pengaduan/index', [
                 'threads' => $threads, // ✅ tetap sama
                 'roles' => $roles,
@@ -45,6 +50,12 @@ class PengaduanController extends BaseController
                 'title'   => 'Pengaduan',
                 'active'  => $this->active,
                 'active1'  => $this->active,
+                'active2'  => $this->active,
+                'active3'  => $this->active,
+                'active4'  => $this->active,
+                'active5'  => $this->active,
+                'active6'  => $this->active,
+                'active7'  => $this->active,
             ]);
 
         } catch (\Throwable $e) {
@@ -57,7 +68,13 @@ class PengaduanController extends BaseController
                 'role'    => $role,
                 'title'   => 'Pengaduan',
                 'active'  => $this->active,
-                'active1'  => $this->active
+                'active1'  => $this->active,
+                'active2'  => $this->active,
+                'active3'  => $this->active,
+                'active4'  => $this->active,
+                'active5'  => $this->active,
+                'active6'  => $this->active,
+                'active7'  => $this->active,
             ]);
         }
     }

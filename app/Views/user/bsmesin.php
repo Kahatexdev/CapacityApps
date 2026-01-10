@@ -40,7 +40,7 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5>Input BS Mesin</h5>
                         <div class="d-flex gap-2 ms-auto">
-                            <a href="http://172.23.39.117/CapacityApps/public/templateExcel/Template Form Input BS MC.xlsx" target="_blank" class="btn btn-success"><i class="fa fa-download"></i> Download Template</a>
+                            <a href="http://172.23.44.16/CapacityApps/public/templateExcel/Template Form Input BS MC.xlsx" target="_blank" class="btn btn-success"><i class="fa fa-download"></i> Download Template</a>
                             <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#importBs">Import</button>
                         </div>
                     </div>

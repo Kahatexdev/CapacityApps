@@ -280,7 +280,7 @@ $routes->group('/capacity', ['filter' => 'capacity'], function ($routes) {
     $routes->post('deletetarget', 'BookingController::deletetarget');
 
     // pengaduan
-    $routes->get('pengaduan', 'PengaduanController::index');
+    $routes->get('pengaduan', 'PengaduanController::getpengaduan');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
 
@@ -630,7 +630,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     $routes->get('export_excel_jatah_bb', 'ExcelController::exportExcelJatahNoModel');
 
     // pengaduan
-    $routes->get('pengaduan', 'PengaduanController::index');
+    $routes->get('pengaduan', 'PengaduanController::getpengaduan');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
 });
@@ -873,7 +873,7 @@ $routes->group('/aps', ['filter' => 'aps'], function ($routes) {
     $routes->get('sisaKebutuhanArea/(:any)', 'MaterialController::sisaKebutuhanArea/$1');
 
     // pengaduan
-    $routes->get('pengaduan', 'PengaduanController::index');
+    $routes->get('pengaduan', 'PengaduanController::getpengaduan');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
 });
@@ -1036,7 +1036,7 @@ $routes->group('/user', ['filter' => 'user'], function ($routes) {
     $routes->get('generateFormRetur/(:any)', 'ExcelController::generateFormRetur/$1');
 
     // pengaduan
-    $routes->get('pengaduan', 'PengaduanController::index');
+    $routes->get('pengaduan', 'PengaduanController::getpengaduan');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
 });
@@ -1257,7 +1257,7 @@ $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
     $routes->get('updatesmv', 'IeController::updatesmv');
     $routes->post('importupdate', 'OrderController::importupdatesmv');
     // pengaduan
-    $routes->get('pengaduan', 'PengaduanController::index');
+    $routes->get('pengaduan', 'PengaduanController::getpengaduan');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
 });
@@ -1295,7 +1295,7 @@ $routes->group(
         $routes->get('exportPdfRetur/(:any)', 'PdfController::exportPdfRetur/$1');
         $routes->get('generateFormRetur/(:any)', 'ExcelController::generateFormRetur/$1');
         // pengaduan
-        $routes->get('pengaduan', 'PengaduanController::index');
+        $routes->get('pengaduan', 'PengaduanController::getpengaduan');
         $routes->post('pengaduan/create', 'PengaduanController::create');
         $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
     }
@@ -1304,7 +1304,7 @@ $routes->group(
 //followup
 $routes->group('/followup', ['filter' => 'followup'], function ($routes) {
     // pengaduan
-    $routes->get('pengaduan', 'PengaduanController::index');
+    $routes->get('pengaduan', 'PengaduanController::getpengaduan');
     $routes->post('pengaduan/create', 'PengaduanController::create');
     $routes->post('pengaduan/reply/(:num)', 'PengaduanController::reply/$1');
     // booking

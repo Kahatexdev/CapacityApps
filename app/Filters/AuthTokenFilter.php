@@ -23,7 +23,7 @@ class AuthTokenFilter implements FilterInterface
 
         try {
             service('curlrequest')->post(
-                'http://172.23.39.117/ComplaintSystem/public/api/logout',
+                'http://172.23.44.16/ComplaintSystem/public/api/logout',
                 [
                     'headers' => [
                         'Authorization' => 'Bearer ' . $token
