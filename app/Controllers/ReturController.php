@@ -112,7 +112,7 @@ class ReturController extends BaseController
         }
         // Ambil data dari API Pengiriman
         $responsePengiriman = file_get_contents($apiUrlPengiriman);
-        // log_message('debug', "API Response Pengiriman: " . $responsePengiriman);
+        log_message('debug', "API Response Pengiriman: " . $responsePengiriman);
         $pengirimanData = json_decode($responsePengiriman, true);
         if ($pengirimanData === null) {
             // log_message('error', "Gagal mendecode data Pengiriman dari: $apiUrlPengiriman");
@@ -123,7 +123,8 @@ class ReturController extends BaseController
         $pengirimanMap = [];
         foreach ($pengirimanData as $pengiriman) {
             // Key disesuaikan: menggunakan noModel dari parameter, kode_warna, item_type dan area_out
-            $keyPengiriman = $noModel . '-' . $pengiriman['kode_warna'] . '-' . $pengiriman['item_type'] . '-' . $pengiriman['area_out'];
+            // $keyPengiriman = $noModel . '-' . $pengiriman['kode_warna'] . '-' . $pengiriman['item_type'] . '-' . $pengiriman['area_out'];
+            $keyPengiriman = $noModel . '-' . $pengiriman['kode_warna'] . '-' . $pengiriman['item_type'];
             $pengirimanMap[$keyPengiriman] = $pengiriman;
         }
 
@@ -161,15 +162,16 @@ class ReturController extends BaseController
             $ttl_kebutuhan = ($prod['qty'] * $comp * $gw / 100 / 1000) + ($loss / 100 * ($prod['qty'] * $comp * $gw / 100 / 1000));
 
             // Buat key untuk mencocokkan data pengiriman
-            $keyPengiriman = $noModel . '-' . $items['kode_warna'] . '-' . $items['item_type'] . '-' . $items['area'];
+            // $keyPengiriman = $noModel . '-' . $items['kode_warna'] . '-' . $items['item_type'] . '-' . $items['area'];
+            $keyPengiriman = $noModel . '-' . $items['kode_warna'] . '-' . $items['item_type'];
 
             // Default field pengiriman
             $pengirimanDefaults = [
                 'area_out'     => '-',
                 'tgl_out'      => '-',
-                'kgs_out'      => '-',
-                'cns_out'      => '-',
-                'krg_out'      => '-',
+                'kgs_out'      => 0,
+                'cns_out'      => 0,
+                'krg_out'      => 0,
                 'lot_out'      => '-',
                 'nama_cluster' => '-',
                 'status'       => '-',
