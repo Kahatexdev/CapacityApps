@@ -116,15 +116,15 @@
                                     </thead>
                                     <tbody>
                                         <?php foreach ($produksi as $order) : ?>
-                                            <tr>
-                                                <td class="text-sm text-center"><?= $order['tgl_produksi']; ?></td>
-                                                <td class="text-sm text-center"><?= $order['mastermodel']; ?></td>
+                                            <tr id="row-<?= $order['id_produksi'] ?>">
+                                                <td class="text-sm text-center tgl_prod"><?= $order['tgl_produksi']; ?></td>
+                                                <td class="text-sm text-center "><?= $order['mastermodel']; ?></td>
                                                 <td class="text-sm text-center"><?= $order['size']; ?></td>
                                                 <td class="text-sm text-center"><?= $order['delivery']; ?></td>
-                                                <td class="text-sm text-center"><?= $order['no_mesin']; ?></td>
-                                                <td class="text-sm text-center"><?= $order['no_box']; ?></td>
-                                                <td class="text-sm text-center"><?= $order['no_label']; ?></td>
-                                                <td class="text-sm text-center"><?= $order['qty_produksi']; ?></td>
+                                                <td class="text-sm text-center no_mesin"><?= $order['no_mesin']; ?></td>
+                                                <td class="text-sm text-center no_box"><?= $order['no_box']; ?></td>
+                                                <td class="text-sm text-center no_label"><?= $order['no_label']; ?></td>
+                                                <td class="text-sm text-center qty_prod"><?= $order['qty_produksi']; ?></td>
                                                 <td class="text-sm text-center">
                                                     <button class="btn btn-warning edit-btn" data-id="<?= $order['id_produksi']; ?>" data-pdk="<?= $order['mastermodel']; ?>" data-style="<?= $order['size']; ?>" data-nomc="<?= $order['no_mesin']; ?>" data-nobox="<?= $order['no_box']; ?>" data-nolabel="<?= $order['no_label']; ?>" data-shift-a=<?= $order['shift_a'] ?> data-shift-b=<?= $order['shift_b'] ?> data-shift-c=<?= $order['shift_c'] ?> data-qty="<?= $order['qty_produksi']; ?>" data-tgl="<?= $order['tgl_produksi']; ?>" data-sisa="<?= $order['sisa']; ?>" data-idaps="<?= $order['idapsperstyle']; ?>">
                                                         Edit</button>
@@ -153,7 +153,8 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="<?= base_url($role . '/editproduksi') ?>" method="post">
+                        <form id="formEditProduksi">
+                            <!-- <form action="<?= base_url($role . '/editproduksi') ?>" method="post"> -->
                             <div class="row">
                                 <div class="col-lg-6">
                                     <input type="text" name="id" id="" hidden class="form-control" value="">
@@ -205,14 +206,11 @@
                                     </div>
                                 </div>
                             </div>
-
-
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn bg-gradient-danger">Ubah</button>
                         </form>
+                        <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" id="btnUpdate" class="btn bg-gradient-danger">Ubah</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -243,58 +241,30 @@
             ]
         });
     });
-    $('.edit-btn').click(function() {
-        var noModel = $(this).data('pdk');
-        var id_prod = $(this).data('id');
-        var style = $(this).data('style');
-        var nobox = $(this).data('nobox');
-        var qty = $(this).data('qty');
-        var nolabel = $(this).data('nolabel');
-        var nomc = $(this).data('nomc');
-        var tgl = $(this).data('tgl');
-        var sisa = $(this).data('sisa');
-        var idaps = $(this).data('idaps');
-        var shiftA = $(this).data('shift-a');
-        var shiftB = $(this).data('shift-b');
-        var shiftC = $(this).data('shift-c');
+    $(document).on('click', '.edit-btn', function() {
+        const btn = this;
 
+        // isi form modal
+        $('#no_model').val(btn.getAttribute('data-pdk'));
+        $('#style').val(btn.getAttribute('data-style'));
+        $('input[name="id"]').val(btn.getAttribute('data-id'));
+        $('input[name="sisa"]').val(btn.getAttribute('data-sisa'));
+        $('input[name="idaps"]').val(btn.getAttribute('data-idaps'));
+        $('input[name="qtycurrent"]').val(btn.getAttribute('data-qty'));
 
+        $('#tgl_prod').val(btn.getAttribute('data-tgl'));
+        $('#no_mc').val(btn.getAttribute('data-nomc'));
+        $('#no_box').val(btn.getAttribute('data-nobox'));
+        $('#no_label').val(btn.getAttribute('data-nolabel'));
 
-        $('#editModal').modal('show'); // Show the modal
-        $('#editModal').find('input[name="no_model"]').val(noModel);
-        $('#editModal').find('input[name="id"]').val(id_prod);
-        $('#editModal').find('input[name="style"]').val(style);
-        $('#editModal').find('input[name="no_mc"]').val(nomc);
-        $('#editModal').find('input[name="no_box"]').val(nobox);
-        $('#editModal').find('input[name="no_label"]').val(nolabel);
-        $('#editModal').find('input[name="qty_prod"]').val(qty);
-        $('#editModal').find('input[name="qtycurrent"]').val(qty);
-        $('#editModal').find('input[name="tgl_prod"]').val(tgl);
-        $('#editModal').find('input[name="sisa"]').val(sisa);
-        $('#editModal').find('input[name="idaps"]').val(idaps);
-        $('#editModal').find('input[name="shift_a"]').val(shiftA);
-        $('#editModal').find('input[name="shift_b"]').val(shiftB);
-        $('#editModal').find('input[name="shift_c"]').val(shiftC);
+        $('#shift_a').val(+btn.getAttribute('data-shift-a') || 0);
+        $('#shift_b').val(+btn.getAttribute('data-shift-b') || 0);
+        $('#shift_c').val(+btn.getAttribute('data-shift-c') || 0);
 
-        // ambil data dari button
-        var $btn = $(this);
-        var shiftA = +$btn.data('shift-a') || 0;
-        var shiftB = +$btn.data('shift-b') || 0;
-        var shiftC = +$btn.data('shift-c') || 0;
-        var qty = +$btn.data('qty') || 0;
-        // isi modal
-        $('#editModal').modal('show');
-        $('#shift_a').val(shiftA);
-        $('#shift_b').val(shiftB);
-        $('#shift_c').val(shiftC);
-        $('#qty_prod').val(qty);
-        // ... isi field lain seperti sebelumnya ...
-
-        // fungsi untuk recalculate
         function recalc() {
-            var a = +$('#shift_a').val() || 0;
-            var b = +$('#shift_b').val() || 0;
-            var c = +$('#shift_c').val() || 0;
+            const a = +$('#shift_a').val() || 0;
+            const b = +$('#shift_b').val() || 0;
+            const c = +$('#shift_c').val() || 0;
             $('#qty_prod').val(a + b + c);
         }
 
@@ -307,7 +277,80 @@
         recalc();
 
         // document.getElementById('confirmationMessage').innerHTML = "Apakah anda yakin memecah" + noModel + " dengan jarum " + selectedMachineTypeId + " ke " + selectedArea;
+        $('#editModal').modal('show');
     });
+    document.getElementById('btnUpdate').addEventListener('click', function() {
+        const form = document.getElementById('formEditProduksi');
+        const formData = new FormData(form);
+
+        fetch("<?= base_url($role . '/editproduksi') ?>", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === 'success') {
+                    console.log(res.data);
+                    // 🔹 update data di tabel (contoh)
+                    updateRow(res.data);
+
+                    // update hidden current qty
+                    document.querySelector('input[name="qtycurrent"]').value = res.data.qty_produksi;
+
+                    // UPDATE data-* BUTTON (WAJIB)
+                    const btn = document.querySelector(`.edit-btn[data-id="${res.data.id_produksi}"]`);
+                    if (btn) {
+                        btn.setAttribute('data-tgl', res.data.tgl_produksi);
+                        btn.setAttribute('data-nomc', res.data.no_mesin);
+                        btn.setAttribute('data-nobox', res.data.no_box);
+                        btn.setAttribute('data-nolabel', res.data.no_label);
+                        btn.setAttribute('data-qty', res.data.qty_produksi);
+                        btn.setAttribute('data-shift-a', res.data.shift_a);
+                        btn.setAttribute('data-shift-b', res.data.shift_b);
+                        btn.setAttribute('data-shift-c', res.data.shift_c);
+                    }
+
+                    // 🔹 tutup modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+                    modal.hide();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: 'Data produksi berhasil diperbarui',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: res.message ?? 'Gagal update data'
+                    });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Terjadi kesalahan saat menghubungi server'
+                });
+            });
+    });
+
+    function updateRow(data) {
+        // contoh: update baris tabel by id
+        const row = document.querySelector(`#row-${data.id_produksi}`);
+        if (!row) return;
+
+        row.querySelector('.tgl_prod').innerText = data.tgl_produksi;
+        row.querySelector('.no_mesin').innerText = data.no_mesin;
+        row.querySelector('.no_box').innerText = data.no_box;
+        row.querySelector('.no_label').innerText = data.no_label;
+        row.querySelector('.qty_prod').innerText = data.qty_produksi;
+    }
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {

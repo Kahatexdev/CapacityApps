@@ -15,7 +15,7 @@ class BsModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['idapsperstyle', 'no_label', 'area', 'tgl_instocklot', 'no_box', 'qty', 'kode_deffect', 'created_at', 'updated_at', 'id_produksi', 'no_model', 'size', 'delivery'];
+    protected $allowedFields    = ['idapsperstyle', 'no_label', 'area', 'tgl_instocklot', 'no_box', 'qty', 'kode_deffect', 'created_at', 'updated_at', 'id_produksi', 'no_model', 'size', 'delivery', 'storage_from'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -67,7 +67,7 @@ class BsModel extends Model
             $this->where('data_bs.area', $theData['area']);
         }
         if (!empty($theData['buyer'])) {
-            $this->where('data_model.kd_buyer_order', $theData['buyer']);
+            $this->like('data_model.kd_buyer_order', $theData['buyer'], 'after');
         }
 
         $data = $this->groupBy('tgl_instocklot, apsperstyle.size, data_bs.kode_deffect')->findAll();
@@ -91,7 +91,7 @@ class BsModel extends Model
             $this->where('area', $theData['area']);
         }
         if (!empty($theData['buyer'])) {
-            $this->where('data_model.kd_buyer_order', $theData['buyer']);
+            $this->like('data_model.kd_buyer_order', $theData['buyer'], 'after');
         }
 
         $result = $this->first();
@@ -113,7 +113,7 @@ class BsModel extends Model
             $this->where('area', $theData['area']);
         }
         if (!empty($theData['buyer'])) {
-            $this->where('data_model.kd_buyer_order', $theData['buyer']);
+            $this->like('data_model.kd_buyer_order', $theData['buyer'], 'after');
         }
 
         return $this->groupBy('Keterangan')
@@ -143,13 +143,16 @@ class BsModel extends Model
     {
         return $this->whereIn('idapsperstyle', $idaps)->delete();
     }
-    public function getDataForReset($area, $awal, $akhir)
+    public function getDataForReset($awal, $akhir, $area = null,)
     {
-        return $this->select('idbs,idapsperstyle,qty,area')
-            ->where('area', $area)
+        $builder = $this->select('idbs,idapsperstyle,qty,area')
             ->where('tgl_instocklot >=', $awal)
-            ->where('tgl_instocklot <=', $akhir)
-            ->findAll();
+            ->where('tgl_instocklot <=', $akhir);
+        if (!empty($area)) {
+            $builder->where('area', $area);
+        }
+
+        return $builder->get()->getResultArray();
     }
     public function deleteBSArea($area, $awal, $akhir)
     {
@@ -300,26 +303,15 @@ class BsModel extends Model
     }
     public function bsPbBulan(array $filters)
     {
-        $builder = $this->select('SUM(data_bs.qty) AS stcPb');
+        $builder = $this->select('SUM(qty) AS stcPb')
+            ->like('storage_from', 'P', 'after');
 
-        // label 3000–3999 dan 8000–8999
-        $builder->groupStart()
-            ->groupStart()
-            ->where('no_label >=', 3000)
-            ->where('no_label <=', 3999)
-            ->groupEnd()
-            ->orGroupStart()
-            ->where('no_label >=', 8000)
-            ->where('no_label <=', 8999)
-            ->groupEnd()
-            ->groupEnd();
+        if (!empty($filters['bulan']) && !empty($filters['tahun'])) {
+            $startDate = sprintf('%04d-%02d-01', $filters['tahun'], $filters['bulan']);
+            $endDate   = date('Y-m-t', strtotime($startDate));
 
-        if (!empty($filters['bulan'])) {
-            $builder->where('MONTH(tgl_instocklot)', $filters['bulan']);
-        }
-
-        if (!empty($filters['tahun'])) {
-            $builder->where('YEAR(tgl_instocklot)', $filters['tahun']);
+            $builder->where('tgl_instocklot >=', $startDate)
+                ->where('tgl_instocklot <=', $endDate);
         }
 
         if (!empty($filters['area'])) {

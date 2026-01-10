@@ -98,4 +98,25 @@ class DowntimeModel extends Model
             ->get()
             ->getRowArray();
     }
+    // public function averageByFilter($theData)
+    // {
+    //     $builder = $this->select('
+    //         AVG(oee) AS oee,
+    //         AVG(quality) AS quality,
+    //         AVG(performance) AS performance,
+    //         AVG(availability) AS availability
+    //     ')
+    //         ->where('oee >', 0);
+
+    //     if (!empty($theData['awal']) && !empty($theData['akhir'])) {
+    //         $builder->where('tanggal >=', $theData['awal'])
+    //             ->where('tanggal <=', $theData['akhir']);
+    //     }
+
+    //     if (!empty($theData['area'])) {
+    //         $builder->where('area', $theData['area']);
+    //     }
+
+    //     return $builder->get()->getRowArray();
+    // }
 }

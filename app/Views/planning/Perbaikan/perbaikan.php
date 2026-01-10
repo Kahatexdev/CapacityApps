@@ -25,6 +25,9 @@
                             <button type="button" class="btn btn-sm btn-success bg-gradient-info shadow text-center border-radius-md" data-bs-toggle="modal" data-bs-target="#exampleModalMessage2">
                                 <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Input Kode Deffect
                             </button> -->
+                            <a href="<?= base_url($role . '/detailViewPerbaikan') ?>" class="btn btn-sm btn-info bg-gradient-info shadow text-center border-radius-md">
+                                <i class="fas fa-file-import text-lg opacity-10" aria-hidden="true"></i> Detail Data Perbaikan
+                            </a>
                             <button type="button"
                                 class="btn btn-sm btn-success bg-gradient-success shadow text-center border-radius-md"
                                 data-bs-toggle="modal"
@@ -119,7 +122,7 @@
                                 </form>
                             </div>
                             <!-- FORM EXPORT EXCEL -->
-                            <div class="col-lg-1 d-flex align-items-end">
+                            <!-- <div class="col-lg-1 d-flex align-items-end">
                                 <form action="<?= base_url($role . '/exportExcelPerbaikan') ?>" method="post" class="w-100">
                                     <input type="hidden" name="awal" value="<?= esc($filter['awal'] ?? '') ?>">
                                     <input type="hidden" name="akhir" value="<?= esc($filter['akhir'] ?? '') ?>">
@@ -132,7 +135,7 @@
                                         Excel
                                     </button>
                                 </form>
-                            </div>
+                            </div> -->
                         </div>
 
                     </div>
