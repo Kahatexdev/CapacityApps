@@ -982,6 +982,41 @@ class ProduksiController extends BaseController
         }
     }
 
+    // public function editproduksi()
+    // {
+    //     $id = $this->request->getPost('id');
+    //     $area = $this->request->getPost('area');
+    //     $idaps = $this->request->getPost('idaps');
+    //     $sisa = $this->request->getPost('sisa');
+    //     $curr = $this->request->getPost('qtycurrent');
+    //     $qtynow = $this->request->getPost('qty_prod');
+    //     $shiftA = $this->request->getPost('shift_a');
+    //     $shiftB = $this->request->getPost('shift_b');
+    //     $shiftC = $this->request->getPost('shift_c');
+    //     $realqty = $sisa + $curr;
+    //     $updateqty = $realqty - $qtynow;
+    //     $updateSisaAps = $this->ApsPerstyleModel->update($idaps, ['sisa' => $updateqty]);
+    //     if ($updateSisaAps) {
+    //         $update = [
+    //             'no_mesin' => $this->request->getPost('no_mc'),
+    //             'no_label' => $this->request->getPost('no_label'),
+    //             'no_box' => $this->request->getPost('no_box'),
+    //             'qty_produksi' => $qtynow,
+    //             'shift_a' => $shiftA,
+    //             'shift_b' => $shiftB,
+    //             'shift_c' => $shiftC,
+    //             'tgl_produksi' => $this->request->getPost('tgl_prod'),
+    //         ];
+    //         $u = $this->produksiModel->update($id, $update);
+    //         if ($u) {
+    //             return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('success', 'Berhasil Update Data Produksi');
+    //         } else {
+    //             return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Data Produksi');
+    //         }
+    //     } else {
+    //         return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Sisa Order');
+    //     }
+    // }
     public function editproduksi()
     {
         $id = $this->request->getPost('id');
@@ -996,26 +1031,44 @@ class ProduksiController extends BaseController
         $realqty = $sisa + $curr;
         $updateqty = $realqty - $qtynow;
         $updateSisaAps = $this->ApsPerstyleModel->update($idaps, ['sisa' => $updateqty]);
-        if ($updateSisaAps) {
-            $update = [
-                'no_mesin' => $this->request->getPost('no_mc'),
-                'no_label' => $this->request->getPost('no_label'),
-                'no_box' => $this->request->getPost('no_box'),
-                'qty_produksi' => $qtynow,
-                'shift_a' => $shiftA,
-                'shift_b' => $shiftB,
-                'shift_c' => $shiftC,
-                'tgl_produksi' => $this->request->getPost('tgl_prod'),
-            ];
-            $u = $this->produksiModel->update($id, $update);
-            if ($u) {
-                return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('success', 'Berhasil Update Data Produksi');
-            } else {
-                return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Data Produksi');
-            }
-        } else {
-            return redirect()->to(base_url(session()->get('role') . '/detailproduksi/' . $area))->withInput()->with('error', 'Gagal Update Sisa Order');
+        if (!$updateSisaAps) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Gagal Update Sisa Order'
+            ]);
         }
+        $update = [
+            'no_mesin' => $this->request->getPost('no_mc'),
+            'no_label' => $this->request->getPost('no_label'),
+            'no_box' => $this->request->getPost('no_box'),
+            'qty_produksi' => $qtynow,
+            'shift_a' => $shiftA,
+            'shift_b' => $shiftB,
+            'shift_c' => $shiftC,
+            'tgl_produksi' => $this->request->getPost('tgl_prod'),
+        ];
+        $u = $this->produksiModel->update($id, $update);
+        if (!$u) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Gagal Update Data Produksi'
+            ]);
+        }
+        // ✅ sukses → kirim balik data untuk update view
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data' => [
+                'id_produksi'  => $id,
+                'tgl_produksi'  => $update['tgl_produksi'],
+                'no_mesin'      => $update['no_mesin'],
+                'no_box'        => $update['no_box'],
+                'no_label'      => $update['no_label'],
+                'shift_a'      => $update['shift_a'],
+                'shift_b'      => $update['shift_b'],
+                'shift_c'      => $update['shift_c'],
+                'qty_produksi'  => $qtynow,
+            ]
+        ]);
     }
 
     public function importbssetting()
