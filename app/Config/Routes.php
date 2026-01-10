@@ -545,6 +545,7 @@ $routes->group('/planning', ['filter' => 'planning'], function ($routes) {
     // perbaikan
     $routes->get('perbaikanArea', 'DeffectController::perbaikanArea');
     $routes->post('viewPerbaikan', 'DeffectController::viewPerbaikan');
+    $routes->get('detailViewPerbaikan', 'DeffectController::detailViewPerbaikan');
     $routes->post('exportExcelPerbaikan', 'ExcelController::exportExcelPerbaikan');
     $routes->post('summaryGlobalPbArea', 'ExcelController::summaryGlobalPbArea');
 
@@ -1199,6 +1200,7 @@ $routes->group('/sudo', ['filter' => 'sudo', 'god'], function ($routes) {
     $routes->get('perbaikanArea', 'DeffectController::perbaikanArea');
     $routes->post('importperbaikanarea', 'ProduksiController::importPerbaikanArea');
     $routes->post('viewPerbaikan', 'DeffectController::viewPerbaikan');
+    $routes->get('detailViewPerbaikan', 'DeffectController::detailViewPerbaikan');
     $routes->post('exportExcelPerbaikan', 'ExcelController::exportExcelPerbaikan');
     $routes->post('summaryGlobalPbArea', 'ExcelController::summaryGlobalPbArea');
     $routes->post('exportExcelDeffect', 'ExcelController::exportExcelDeffect');
