@@ -1730,4 +1730,14 @@ class ApsPerstyleModel extends Model
             ->orderBy('apsperstyle.mastermodel', 'ASC')
             ->findAll();
     }
+    public function getQtyPcsByDelivery($bulan = null, $tahun = null, $unit = null)
+    {
+        return $this->select('SUM(qty) AS qty, mastermodel, size, delivery, production_unit')
+            ->where('qty >', 0)
+            ->where('MONTH(delivery)', $bulan)
+            ->where('YEAR(delivery)', $tahun)
+            ->where('production_unit', $unit)
+            ->groupBy('mastermodel, delivery, size')
+            ->findAll();
+    }
 }

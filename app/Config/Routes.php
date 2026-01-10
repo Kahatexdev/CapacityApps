@@ -42,6 +42,7 @@ $routes->group(
         $routes->get('getDataArea', 'ApiController::getArea');
         $routes->get('getPPhPerhari/(:any)/(:any)', 'ApiController::getPPhPerhari/$1/$2');
         $routes->get('getHariLibur', 'ApiController::getHariLibur');
+        $routes->post('getQtyPcsByDelivery', 'ApiController::getQtyPcsByDelivery');
 
         $routes->get('getPlanMesin', 'ApiController::getPlanMesin');
         $routes->get('exportPlanningJlMc/(:any)', 'PlanningJalanMcController::excelPlanningJlMc/$1');
@@ -1278,7 +1279,7 @@ $routes->group('/ie', ['filter' => 'ie'], function ($routes) {
     // oee
     $routes->get('oee', 'OEEController::index');
 
-    
+
     // datamontir
     $routes->get('dataMontir', 'IeController::dataMontir');
 

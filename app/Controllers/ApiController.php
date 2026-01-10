@@ -924,4 +924,15 @@ class ApiController extends ResourceController
 
         return $this->response->setJSON($data);
     }
+
+    public function getQtyPcsByDelivery()
+    {
+        $bulan = $this->request->getJSON(true)['bulan'] ?? [];
+        $tahun = $this->request->getJSON(true)['tahun'] ?? [];
+        $unit = $this->request->getJSON(true)['unit'] ?? [];
+
+        $data = $this->ApsPerstyleModel->getQtyPcsByDelivery($bulan, $tahun, $unit);
+
+        return $this->response->setJSON($data);
+    }
 }
