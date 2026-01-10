@@ -226,7 +226,7 @@ class PerbaikanAreaModel extends Model
             $prod->where('produksi.area', $theData['area']);
         }
         if (!empty($theData['buyer'])) {
-            $prod->where('data_model.kd_buyer_order', $theData['buyer']);
+            $prod->like('data_model.kd_buyer_order', $theData['buyer'], 'after');
         }
 
         $prodduksi = $prod->groupBy('produksi.tgl_produksi')
@@ -250,7 +250,7 @@ class PerbaikanAreaModel extends Model
             $pb->where('perbaikan_area.area', $theData['area']);
         }
         if (!empty($theData['buyer'])) {
-            $pb->where('data_model.kd_buyer_order', $theData['buyer']);
+            $pb->like('data_model.kd_buyer_order', $theData['buyer'], 'after');
         }
 
         $perbaikan = $pb->groupBy('perbaikan_area.tgl_perbaikan')
@@ -280,7 +280,7 @@ class PerbaikanAreaModel extends Model
             $stc->where('data_bs.area', $theData['area']);
         }
         if (!empty($theData['buyer'])) {
-            $stc->where('data_model.kd_buyer_order', $theData['buyer']);
+            $stc->like('data_model.kd_buyer_order', $theData['buyer'], 'after');
         }
 
         $stocklot = $stc->groupBy('data_bs.tgl_instocklot')
@@ -317,13 +317,9 @@ class PerbaikanAreaModel extends Model
             $stc   = (float) $row['stc'];
             $stcPb = (float) $row['stcPb'];
 
-            $repair = ($prod > 0 && $pb > 0) ? round(($pb / $prod) * 100) : 0;
-            $bsRepair = ($stcPb > 0 && $pb > 0) ? round(($stcPb / $pb) * 100) : 0;
-            $goodRepair = ($pb > 0) ? round((($pb - $stcPb) / $pb) * 100) : 0;
-            $pureStc = ($prod > 0) ? round((($stc - $stcPb) / $prod) * 100) : 0;
+            $goodRepair = round($pb - $stcPb);
+            $pureStc = round($stc - $stcPb);
 
-            $summary[$tgl]['repair']     = $repair;
-            $summary[$tgl]['bsRepair']   = $bsRepair;
             $summary[$tgl]['goodRepair'] = $goodRepair;
             $summary[$tgl]['pureStc']    = $pureStc;
         }

@@ -24,6 +24,22 @@
         });
     </script>
 <?php endif; ?>
+<style>
+    .num {
+        font-weight: 600;
+    }
+
+    .percent {
+        display: block;
+        font-size: 0.8em;
+        color: #6c757d;
+        margin-top: 2px;
+    }
+
+    td {
+        vertical-align: middle;
+    }
+</style>
 
 <div class="row">
     <div class="col">
@@ -62,7 +78,64 @@
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col">
+        <div class="card mt-2">
 
+            <div class="card-body">
+                <div class="datatable">
+                    <table id="dataTable1" class="display striped" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>TANGGAL</th>
+                                <th>PROD (DZ)</th>
+                                <th>IN PB (DZ)</th>
+                                <th>GOOD REPAIR (DZ)</th>
+                                <th>DEFFECT PERBAIKAN (DZ)</th>
+                                <th>IN STOCKLOT All Storage (DZ)</th>
+                                <th>PURE STOCKLOT (Kecuali PB) (DZ)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($getData as $tgl => $id): ?>
+                                <tr>
+                                    <td><?= esc($tgl) ?></td>
+
+                                    <td class="num"><?= round($id['prod'], 2) ?></td>
+
+                                    <td>
+                                        <span class="num"><?= round($id['pb'], 2) ?></span>
+                                        <span class="percent"><?= $id['pb'] > 0 ? round($id['pb'] / $id['prod'] * 100, 1) : 0 ?>%</span>
+                                    </td>
+
+                                    <td>
+                                        <span class="num"><?= round($id['goodRepair'], 2) ?></span>
+                                        <span class="percent"><?= $id['goodRepair'] > 0 ? round($id['goodRepair'] / $id['pb'] * 100, 1) : 0 ?>%</span>
+                                    </td>
+
+                                    <td>
+                                        <span class="num"><?= round($id['stcPb'], 2) ?></span>
+                                        <span class="percent"><?= $id['stcPb'] > 0 ? round($id['stcPb'] / $id['pb'] * 100, 1) : 0 ?>%</span>
+                                    </td>
+
+                                    <td>
+                                        <span class="num"><?= round($id['stc'], 2) ?></span>
+                                        <span class="percent"><?= $id['stc'] > 0 ? round($id['stc'] / $id['prod'] * 100, 1) : 0 ?>%</span>
+                                    </td>
+
+                                    <td>
+                                        <span class="num"><?= round($id['pureStc'], 2) ?></span>
+                                        <span class="percent"><?= $id['pureStc'] > 0 ? round($id['pureStc'] / $id['stc'] * 100, 1) : 0 ?>%</span>
+                                    </td>
+                                </tr>
+                            <?php endforeach ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col">
         <div class="card mt-2">
@@ -94,7 +167,7 @@
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th>Keterangan</th>
+                                    <th>TOP 10 Perbaikan</th>
                                     <th>Jumlah</th>
                                 </tr>
                             </thead>
@@ -126,51 +199,7 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col">
-        <div class="card mt-2">
 
-            <div class="card-body">
-                <div class="datatable">
-                    <table id="dataTable1" class="display  striped" style="width:100%">
-                        <thead>
-
-                            <tr>
-                                <th>TANGGAL</th>
-                                <th>PROD (DZ)</th>
-                                <th>IN PB (DZ)</th>
-                                <th>ALL IN STOCKLOT (DZ)</th>
-                                <th>DEFFECT PERBAIKAN</th>
-                                <th>REPAIR (%)</th>
-                                <th>BS REPAIR (%)</th>
-                                <th>GOOD REPAIR (%)</th>
-                                <th>PURE STOCKLOT (%)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                            <?php foreach ($getData as $tgl => $id) : ?>
-                                <tr>
-                                    <td><?= $tgl ?></td>
-                                    <td><?= round($id['prod'], 2) ?></td>
-                                    <td><?= round($id['pb'], 2) ?></td>
-                                    <td><?= round($id['stc'], 2) ?></td>
-                                    <td><?= round($id['stcPb'], 2) ?></td>
-                                    <td><?= $id['repair'] ?>%</td>
-                                    <td><?= $id['bsRepair'] ?>%</td>
-                                    <td><?= $id['goodRepair'] ?>%</td>
-                                    <td><?= $id['pureStc'] ?>%</td>
-                                </tr>
-                            <?php endforeach ?>
-                        </tbody>
-
-                    </table>
-
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 <script>
